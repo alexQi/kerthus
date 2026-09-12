@@ -1,0 +1,36 @@
+{
+  "requests": [
+    {
+      "path": "/third",
+      "platform_headers_present": false,
+      "referrer_present": false
+    },
+    {
+      "path": "/third",
+      "platform_headers_present": false,
+      "referrer_present": false
+    },
+    {
+      "path": "/inside",
+      "platform_headers_present": false,
+      "referrer_present": false
+    },
+    {
+      "path": "/inside",
+      "platform_headers_present": false,
+      "referrer_present": false
+    },
+    {
+      "path": "/inside",
+      "platform_headers_present": false,
+      "referrer_present": false
+    },
+    {
+      "path": "/inside",
+      "platform_headers_present": false,
+      "referrer_present": false
+    }
+  ],
+  "all_without_platform_headers": true,
+  "all_without_referrer": true
+}

@@ -1,0 +1,1 @@
+ALTER TABLE operations MODIFY resource_id BIGINT NULL DEFAULT NULL;

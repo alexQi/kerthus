@@ -1,0 +1,248 @@
+{
+  "schema_version": 1,
+  "app_code": "system",
+  "name": "平台管理",
+  "release_version": "1.0.0",
+  "platform_api_version": "v1",
+  "resource_version": 2,
+  "http_contract": "api/http/legacy.openapi.yaml",
+  "service_key": "kerthus.saas",
+  "route_prefix": "/system",
+  "frontend_entry": "bundled",
+  "home": "/system/dashboard",
+  "resources": [
+    {
+      "code": "system:root",
+      "name": "平台管理",
+      "type": "menu",
+      "path": "/system",
+      "component": "LAYOUT",
+      "sort": 0
+    },
+    {
+      "code": "system:home",
+      "parent_code": "system:root",
+      "name": "工作台",
+      "type": "view",
+      "path": "/system/dashboard",
+      "component": "common/dashboard/index",
+      "sort": 1
+    },
+    {
+      "code": "system:tenants",
+      "parent_code": "system:root",
+      "name": "租户管理",
+      "type": "view",
+      "path": "/system/tenants",
+      "component": "system/tenant/main/index",
+      "sort": 2
+    },
+    {
+      "code": "system:tenant-detail",
+      "parent_code": "system:root",
+      "name": "租户详情",
+      "type": "view",
+      "path": "/system/tenant/detail/:id",
+      "component": "system/tenant/detail/index",
+      "sort": 3,
+      "meta": {
+        "hideMenu": true,
+        "hideTab": true,
+        "currentActiveMenu": "/system/tenants"
+      }
+    },
+    {
+      "code": "system:applications",
+      "parent_code": "system:root",
+      "name": "应用管理",
+      "type": "view",
+      "path": "/system/applications",
+      "component": "system/application/main/index",
+      "sort": 4
+    },
+    {
+      "code": "system:resources",
+      "parent_code": "system:root",
+      "name": "资源管理",
+      "type": "view",
+      "path": "/system/resources",
+      "component": "system/application/resource/index",
+      "sort": 5
+    },
+    {
+      "code": "system:authorizations",
+      "parent_code": "system:root",
+      "name": "租户应用授权",
+      "type": "view",
+      "path": "/system/authorizations",
+      "component": "system/application/authorize/index",
+      "sort": 6
+    },
+    {
+      "code": "system:accounts",
+      "parent_code": "system:root",
+      "name": "全局账号",
+      "type": "view",
+      "path": "/system/accounts",
+      "component": "system/tenant/user/index",
+      "sort": 7
+    },
+    {
+      "code": "system:application:authorize:auth",
+      "parent_code": "system:root",
+      "name": "system:application:authorize:auth",
+      "type": "action"
+    },
+    {
+      "code": "system:application:authorize:deauth",
+      "parent_code": "system:root",
+      "name": "system:application:authorize:deauth",
+      "type": "action"
+    },
+    {
+      "code": "system:application:resource:save",
+      "parent_code": "system:root",
+      "name": "system:application:resource:save",
+      "type": "action"
+    },
+    {
+      "code": "system:application:main:create",
+      "parent_code": "system:root",
+      "name": "system:application:main:create",
+      "type": "action"
+    },
+    {
+      "code": "system:application:main:delete",
+      "parent_code": "system:root",
+      "name": "system:application:main:delete",
+      "type": "action"
+    },
+    {
+      "code": "system:application:main:edit",
+      "parent_code": "system:root",
+      "name": "system:application:main:edit",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:main:delete",
+      "parent_code": "system:root",
+      "name": "system:tenant:main:delete",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:main:edit",
+      "parent_code": "system:root",
+      "name": "system:tenant:main:edit",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:main:verify",
+      "parent_code": "system:root",
+      "name": "system:tenant:main:verify",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:main:view",
+      "parent_code": "system:root",
+      "name": "system:tenant:main:view",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:role:authRoleResource",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:role:authRoleResource",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:role:delete",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:role:delete",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:role:save",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:role:save",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:role:relateEmployee",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:role:relateEmployee",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:org:delete",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:org:delete",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:org:save",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:org:save",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:position:create",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:position:create",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:position:delete",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:position:delete",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:position:edit",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:position:edit",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:apps:auth",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:apps:auth",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:apps:deauth",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:apps:deauth",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:employee:create",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:employee:create",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:employee:edit",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:employee:edit",
+      "type": "action"
+    },
+    {
+      "code": "system:tenant:detail:employee:resetPassword",
+      "parent_code": "system:root",
+      "name": "system:tenant:detail:employee:resetPassword",
+      "type": "action"
+    },
+    {
+      "code": "system:application-auth",
+      "parent_code": "system:root",
+      "name": "开通应用",
+      "type": "view",
+      "path": "/system/application/auth",
+      "component": "system/application/auth/index",
+      "meta": {
+        "hideMenu": true,
+        "hideTab": true,
+        "currentActiveMenu": "/system/authorizations"
+      }
+    }
+  ]
+}

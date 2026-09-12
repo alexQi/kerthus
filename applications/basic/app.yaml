@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "app_code": "basic",
+  "name": "企业管理",
+  "release_version": "1.0.0",
+  "platform_api_version": "v1",
+  "resource_version": 2,
+  "http_contract": "api/http/legacy.openapi.yaml",
+  "service_key": "kerthus.saas",
+  "route_prefix": "/system",
+  "frontend_entry": "bundled",
+  "home": "/basic/dashboard",
+  "resources": [
+    {
+      "code": "basic:root",
+      "name": "企业管理",
+      "type": "menu",
+      "path": "/basic",
+      "component": "LAYOUT",
+      "sort": 0
+    },
+    {
+      "code": "basic:home",
+      "parent_code": "basic:root",
+      "name": "工作台",
+      "type": "view",
+      "path": "/basic/dashboard",
+      "component": "common/dashboard/index",
+      "sort": 1
+    },
+    {
+      "code": "basic:members",
+      "parent_code": "basic:root",
+      "name": "成员管理",
+      "type": "view",
+      "path": "/basic/members",
+      "component": "basic/user/main/index",
+      "sort": 2
+    },
+    {
+      "code": "basic:organizations",
+      "parent_code": "basic:root",
+      "name": "组织管理",
+      "type": "view",
+      "path": "/basic/organizations",
+      "component": "basic/user/org/index",
+      "sort": 3
+    },
+    {
+      "code": "basic:positions",
+      "parent_code": "basic:root",
+      "name": "岗位管理",
+      "type": "view",
+      "path": "/basic/positions",
+      "component": "basic/user/position/index",
+      "sort": 4
+    },
+    {
+      "code": "basic:roles",
+      "parent_code": "basic:root",
+      "name": "角色权限",
+      "type": "view",
+      "path": "/basic/roles",
+      "component": "basic/system/role/index",
+      "sort": 5
+    },
+    {
+      "code": "basic:audit",
+      "parent_code": "basic:root",
+      "name": "操作审计",
+      "type": "view",
+      "path": "/basic/audit",
+      "component": "basic/system/audit/index",
+      "sort": 6
+    },
+    {
+      "code": "basic:user:role:authRoleResource",
+      "parent_code": "basic:root",
+      "name": "basic:user:role:authRoleResource",
+      "type": "action"
+    },
+    {
+      "code": "basic:user:role:delete",
+      "parent_code": "basic:root",
+      "name": "basic:user:role:delete",
+      "type": "action"
+    },
+    {
+      "code": "basic:user:role:save",
+      "parent_code": "basic:root",
+      "name": "basic:user:role:save",
+      "type": "action"
+    },
+    {
+      "code": "basic:user:role:relateEmployee",
+      "parent_code": "basic:root",
+      "name": "basic:user:role:relateEmployee",
+      "type": "action"
+    },
+    {
+      "code": "basic:user:org:delete",
+      "parent_code": "basic:root",
+      "name": "basic:user:org:delete",
+      "type": "action"
+    },
+    {
+      "code": "basic:user:org:save",
+      "parent_code": "basic:root",
+      "name": "basic:user:org:save",
+      "type": "action"
+    },
+    {
+      "code": "basic:user:position:create",
+      "parent_code": "basic:root",
+      "name": "basic:user:position:create",
+      "type": "action"
+    },
+    {
+      "code": "basic:user:position:delete",
+      "parent_code": "basic:root",
+      "name": "basic:user:position:delete",
+      "type": "action"
+    },
+    {
+      "code": "basic:user:position:edit",
+      "parent_code": "basic:root",
+      "name": "basic:user:position:edit",
+      "type": "action"
+    },
+    {
+      "code": "basic:user:main:create",
+      "parent_code": "basic:root",
+      "name": "basic:user:main:create",
+      "type": "action"
+    },
+    {
+      "code": "basic:user:main:edit",
+      "parent_code": "basic:root",
+      "name": "basic:user:main:edit",
+      "type": "action"
+    },
+    {
+      "code": "basic:user:main:resetPassword",
+      "parent_code": "basic:root",
+      "name": "basic:user:main:resetPassword",
+      "type": "action"
+    }
+  ]
+}

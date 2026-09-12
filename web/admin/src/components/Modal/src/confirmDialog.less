@@ -1,0 +1,37 @@
+// Confirmation dialogs render a public Modal, without BasicModal's padded scrollbar.
+.ant-modal.kerthus-confirm-dialog {
+  .ant-modal-header {
+    padding: 24px 24px 0;
+    border-bottom: 0;
+  }
+
+  .ant-modal-body {
+    padding: 24px;
+  }
+
+  .ant-modal-footer {
+    margin-top: 0;
+    padding: 0 24px 24px;
+    border-top: 0;
+  }
+
+  .kerthus-confirm-dialog__body {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .kerthus-confirm-dialog__icon {
+    flex: none;
+    color: @warning-color;
+    font-size: 22px;
+    line-height: 1;
+  }
+
+  .kerthus-confirm-dialog__content {
+    flex: 1;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    line-height: 22px;
+  }
+}

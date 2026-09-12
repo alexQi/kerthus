@@ -1,0 +1,1 @@
+ALTER TABLE users ADD COLUMN single_login BOOLEAN NOT NULL DEFAULT FALSE AFTER platform_admin;

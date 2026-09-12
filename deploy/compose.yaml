@@ -1,0 +1,49 @@
+name: kerthus-foundation
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_DATABASE: kerthus
+      MYSQL_USER: kerthus
+      MYSQL_PASSWORD: ${KERTHUS_DB_PASSWORD:?generate .local/saas.env}
+      MYSQL_ROOT_PASSWORD: ${KERTHUS_DB_ROOT_PASSWORD:?generate .local/saas.env}
+    ports: ["127.0.0.1:13306:3306"]
+    volumes: ["mysql-data:/var/lib/mysql"]
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$MYSQL_PASSWORD mysql -ukerthus -Dkerthus -e 'SELECT 1' >/dev/null"]
+      interval: 3s
+      timeout: 3s
+      retries: 40
+  redis:
+    image: redis:7.4-alpine
+    command: ["sh", "-c", "exec redis-server --appendonly yes --requirepass \"$$REDIS_PASSWORD\""]
+    environment:
+      REDIS_PASSWORD: ${KERTHUS_REDIS_PASSWORD:?generate .local/saas.env}
+    ports: ["127.0.0.1:16379:6379"]
+    volumes: ["redis-data:/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "REDISCLI_AUTH=$$REDIS_PASSWORD redis-cli ping | grep -q PONG"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  consul:
+    image: hashicorp/consul:1.21.5
+    command: ["agent", "-dev", "-client=0.0.0.0", "-log-level=warn"]
+    ports: ["127.0.0.1:18500:8500"]
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  minio:
+    image: minio/minio:RELEASE.2025-04-22T22-12-26Z
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${KERTHUS_STORAGE_ACCESS_KEY:?generate .local/saas.env}
+      MINIO_ROOT_PASSWORD: ${KERTHUS_STORAGE_SECRET_KEY:?generate .local/saas.env}
+    ports: ["127.0.0.1:19000:9000", "127.0.0.1:19001:9001"]
+    volumes: ["object-data:/data"]
+volumes:
+  mysql-data:
+  redis-data:
+  object-data:

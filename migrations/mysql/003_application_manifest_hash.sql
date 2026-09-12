@@ -1,0 +1,1 @@
+ALTER TABLE apps ADD COLUMN manifest_hash VARCHAR(64) NOT NULL DEFAULT '';

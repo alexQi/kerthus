@@ -1,0 +1,14 @@
+{
+  "result": "PASS",
+  "base": "http://127.0.0.1:54738",
+  "checks": [
+    "configured upload limits returned in bytes",
+    "Chinese filename attachment: authenticated upload/download byte equality",
+    "HEAD returns metadata without body",
+    "cross-tenant, incorrect app, anonymous, and public file routes rejected",
+    "legacy image upload returns string key and remains publicly readable"
+  ],
+  "created_private_files": 1,
+  "created_public_images": 1,
+  "cleanup": "Disposable supervisor removes fixture objects and database; synthetic sessions logged out."
+}

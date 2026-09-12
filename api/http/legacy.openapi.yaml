@@ -1,0 +1,2217 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Kerthus SaaS compatibility API",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:18080"
+    }
+  ],
+  "paths": {
+    "/system/user/login": {
+      "post": {
+        "operationId": "post_system_user_login",
+        "x-app-code": "system",
+        "x-resource-code": "system:accounts",
+        "x-action": "user.login",
+        "x-group": "user",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "x-public": true,
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/user/logout": {
+      "get": {
+        "operationId": "get_system_user_logout",
+        "x-app-code": "system",
+        "x-resource-code": "system:accounts",
+        "x-action": "user.logout",
+        "x-group": "user",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/user/profile": {
+      "get": {
+        "operationId": "get_system_user_profile",
+        "x-app-code": "system",
+        "x-resource-code": "system:accounts",
+        "x-action": "user.profile",
+        "x-group": "user",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/user/auth": {
+      "get": {
+        "operationId": "get_system_user_auth",
+        "x-app-code": "system",
+        "x-resource-code": "system:accounts",
+        "x-action": "user.auth",
+        "x-group": "user",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/user/modifyInfo": {
+      "post": {
+        "operationId": "post_system_user_modifyInfo",
+        "x-app-code": "system",
+        "x-resource-code": "system:accounts",
+        "x-action": "user.modifyInfo",
+        "x-group": "user",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/user/modifyPassword": {
+      "post": {
+        "operationId": "post_system_user_modifyPassword",
+        "x-app-code": "system",
+        "x-resource-code": "system:accounts",
+        "x-action": "user.modifyPassword",
+        "x-group": "user",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/user/resetPassword": {
+      "post": {
+        "operationId": "post_system_user_resetPassword",
+        "x-app-code": "system",
+        "x-resource-code": "system:accounts",
+        "x-action": "user.resetPassword",
+        "x-group": "user",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/user/setStatus": {
+      "get": {
+        "operationId": "get_system_user_setStatus",
+        "x-app-code": "system",
+        "x-resource-code": "system:accounts",
+        "x-action": "user.setStatus",
+        "x-group": "user",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/user/query": {
+      "get": {
+        "operationId": "get_system_user_query",
+        "x-app-code": "system",
+        "x-resource-code": "system:accounts",
+        "x-action": "user.query",
+        "x-group": "user",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/tenant/query": {
+      "get": {
+        "operationId": "get_system_tenant_query",
+        "x-app-code": "system",
+        "x-resource-code": "system:tenants",
+        "x-action": "tenant.query",
+        "x-group": "tenant",
+        "parameters": [
+          {
+            "name": "start_time",
+            "in": "query",
+            "description": "Inclusive creation date in Asia/Shanghai. Combined with end_time, the full selected calendar days are included.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "end_time",
+            "in": "query",
+            "description": "Inclusive final creation date in Asia/Shanghai; SQL uses an exclusive bound at midnight of the next day.",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/tenant/info": {
+      "get": {
+        "operationId": "get_system_tenant_info",
+        "x-app-code": "system",
+        "x-resource-code": "system:tenants",
+        "x-action": "tenant.info",
+        "x-group": "tenant",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/tenant/delete": {
+      "get": {
+        "operationId": "get_system_tenant_delete",
+        "x-app-code": "system",
+        "x-resource-code": "system:tenants",
+        "x-action": "tenant.delete",
+        "x-group": "tenant",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/tenant/setStatus": {
+      "get": {
+        "operationId": "get_system_tenant_setStatus",
+        "x-app-code": "system",
+        "x-resource-code": "system:tenants",
+        "x-action": "tenant.setStatus",
+        "x-group": "tenant",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/tenant/verify": {
+      "get": {
+        "operationId": "get_system_tenant_verify",
+        "x-app-code": "system",
+        "x-resource-code": "system:tenants",
+        "x-action": "tenant.verify",
+        "x-group": "tenant",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/tenant/save": {
+      "post": {
+        "operationId": "post_system_tenant_save",
+        "x-app-code": "system",
+        "x-resource-code": "system:tenants",
+        "x-action": "tenant.save",
+        "x-group": "tenant",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/tenant/approve": {
+      "post": {
+        "operationId": "post_system_tenant_approve",
+        "x-app-code": "system",
+        "x-resource-code": "system:tenants",
+        "x-action": "tenant.approve",
+        "x-group": "tenant",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/app/query": {
+      "get": {
+        "operationId": "get_system_app_query",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.query",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Substring match; combined with other filters before pagination."
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Substring match; combined with other filters before pagination."
+          }
+        ]
+      }
+    },
+    "/system/app/delete": {
+      "get": {
+        "operationId": "get_system_app_delete",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.delete",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/app/setStatus": {
+      "get": {
+        "operationId": "get_system_app_setStatus",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.setStatus",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/app/getAppItems": {
+      "get": {
+        "operationId": "get_system_app_getAppItems",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.getAppItems",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/app/save": {
+      "post": {
+        "operationId": "post_system_app_save",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.save",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "icon": {
+                    "type": "string"
+                  },
+                  "desc": {
+                    "type": "string"
+                  },
+                  "remark": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/app/getGlobalResource": {
+      "get": {
+        "operationId": "get_system_app_getGlobalResource",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.getGlobalResource",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/app/getResource": {
+      "get": {
+        "operationId": "get_system_app_getResource",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.getResource",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/app/getAppResources": {
+      "get": {
+        "operationId": "get_system_app_getAppResources",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.getAppResources",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/app/queryResourceApis": {
+      "get": {
+        "operationId": "get_system_app_queryResourceApis",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.queryResourceApis",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/app/removeResource": {
+      "get": {
+        "operationId": "get_system_app_removeResource",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.removeResource",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/app/saveResource": {
+      "post": {
+        "operationId": "post_system_app_saveResource",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.saveResource",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "redirect": {
+                    "type": "string"
+                  },
+                  "remark": {
+                    "type": "string"
+                  },
+                  "open_with": {
+                    "type": "string",
+                    "enum": [
+                      "component",
+                      "route"
+                    ],
+                    "description": "Only component routes may be saved. Legacy unsupported modes are retained read-only."
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/app/queryTeantAuthorizes": {
+      "get": {
+        "operationId": "get_system_app_queryTeantAuthorizes",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.queryTeantAuthorizes",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant_name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Substring match; combined with other filters before pagination."
+          },
+          {
+            "name": "app_name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Substring match; combined with other filters before pagination."
+          }
+        ]
+      }
+    },
+    "/system/app/getTenantResourceIds": {
+      "get": {
+        "operationId": "get_system_app_getTenantResourceIds",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.getTenantResourceIds",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/app/getTenantResources": {
+      "get": {
+        "operationId": "get_system_app_getTenantResources",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.getTenantResources",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/app/authorizeApp": {
+      "post": {
+        "operationId": "post_system_app_authorizeApp",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.authorizeApp",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/app/deauthorizeApp": {
+      "post": {
+        "operationId": "post_system_app_deauthorizeApp",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app.deauthorizeApp",
+        "x-group": "app",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/org/query": {
+      "get": {
+        "operationId": "get_system_org_query",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:organizations",
+        "x-action": "organization.read",
+        "x-group": "org",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/org/info": {
+      "get": {
+        "operationId": "get_system_org_info",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:organizations",
+        "x-action": "organization.read",
+        "x-group": "org",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/org/delete": {
+      "get": {
+        "operationId": "get_system_org_delete",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:organizations",
+        "x-action": "organization.write",
+        "x-group": "org",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/org/save": {
+      "post": {
+        "operationId": "post_system_org_save",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:organizations",
+        "x-action": "organization.write",
+        "x-group": "org",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/position/query": {
+      "get": {
+        "operationId": "get_system_position_query",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:positions",
+        "x-action": "organization.read",
+        "x-group": "position",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/position/delete": {
+      "get": {
+        "operationId": "get_system_position_delete",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:positions",
+        "x-action": "organization.write",
+        "x-group": "position",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/position/setStatus": {
+      "get": {
+        "operationId": "get_system_position_setStatus",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:positions",
+        "x-action": "organization.write",
+        "x-group": "position",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/position/getItems": {
+      "get": {
+        "operationId": "get_system_position_getItems",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:positions",
+        "x-action": "organization.read",
+        "x-group": "position",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/position/save": {
+      "post": {
+        "operationId": "post_system_position_save",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:positions",
+        "x-action": "organization.write",
+        "x-group": "position",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/employee/query": {
+      "get": {
+        "operationId": "get_system_employee_query",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:members",
+        "x-action": "membership.read",
+        "x-group": "employee",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/employee/info": {
+      "get": {
+        "operationId": "get_system_employee_info",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:members",
+        "x-action": "membership.read",
+        "x-group": "employee",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/employee/getTenantApps": {
+      "get": {
+        "operationId": "get_system_employee_getTenantApps",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:members",
+        "x-action": "membership.read",
+        "x-group": "employee",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/employee/queryTenantApps": {
+      "get": {
+        "operationId": "get_system_employee_queryTenantApps",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:members",
+        "x-action": "membership.read",
+        "x-group": "employee",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Substring match; combined with other filters before pagination."
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Substring match; combined with other filters before pagination."
+          }
+        ],
+        "description": "Paginated active applications actually opened for the target tenant. Rows include tenant_app_id (entitlement ID; distinct from application id) and expiration_time (Unix seconds; zero means permanent)."
+      }
+    },
+    "/system/employee/hasApp": {
+      "get": {
+        "operationId": "get_system_employee_hasApp",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:members",
+        "x-action": "membership.read",
+        "x-group": "employee",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/employee/save": {
+      "post": {
+        "operationId": "post_system_employee_save",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:members",
+        "x-action": "membership.write",
+        "x-group": "employee",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/employee/setStatus": {
+      "get": {
+        "operationId": "get_system_employee_setStatus",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:members",
+        "x-action": "membership.write",
+        "x-group": "employee",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/employee/delete": {
+      "get": {
+        "operationId": "get_system_employee_delete",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:members",
+        "x-action": "membership.write",
+        "x-group": "employee",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/role/query": {
+      "get": {
+        "operationId": "get_system_role_query",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:roles",
+        "x-action": "access.read",
+        "x-group": "role",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/role/delete": {
+      "get": {
+        "operationId": "get_system_role_delete",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:roles",
+        "x-action": "access.write",
+        "x-group": "role",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/role/setStatus": {
+      "get": {
+        "operationId": "get_system_role_setStatus",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:roles",
+        "x-action": "access.write",
+        "x-group": "role",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/role/queryRoleResources": {
+      "get": {
+        "operationId": "get_system_role_queryRoleResources",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:roles",
+        "x-action": "access.read",
+        "x-group": "role",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/role/save": {
+      "post": {
+        "operationId": "post_system_role_save",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:roles",
+        "x-action": "access.write",
+        "x-group": "role",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/role/authRoleResource": {
+      "post": {
+        "operationId": "post_system_role_authRoleResource",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:roles",
+        "x-action": "access.write",
+        "x-group": "role",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/role/relateEmployee": {
+      "post": {
+        "operationId": "post_system_role_relateEmployee",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:roles",
+        "x-action": "access.write",
+        "x-group": "role",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/system/config/districts": {
+      "get": {
+        "operationId": "get_system_config_districts",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:home",
+        "x-action": "dictionary.read",
+        "x-group": "config",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/system/log/query": {
+      "get": {
+        "operationId": "get_system_log_query",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:audit",
+        "x-action": "audit.read",
+        "x-group": "log",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/app/info/init": {
+      "get": {
+        "operationId": "get_system_app_info_init",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app/info.init",
+        "x-group": "app/info",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "x-public": true
+      }
+    },
+    "/app/info/servers": {
+      "get": {
+        "operationId": "get_system_app_info_servers",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app/info.servers",
+        "x-group": "app/info",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/app/info/routes": {
+      "get": {
+        "operationId": "get_system_app_info_routes",
+        "x-app-code": "system",
+        "x-resource-code": "system:applications",
+        "x-action": "app/info.routes",
+        "x-group": "app/info",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Envelope"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ]
+      }
+    },
+    "/app/file/upload": {
+      "post": {
+        "operationId": "post_system_app_file_upload",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:home",
+        "x-action": "app/file.upload",
+        "x-group": "app/file",
+        "responses": {
+          "200": {
+            "description": "Legacy response envelope",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "string",
+                          "description": "Legacy string object key; private keys are never public URLs."
+                        },
+                        "file": {
+                          "type": "object",
+                          "properties": {
+                            "id": {
+                              "type": "integer",
+                              "format": "int64"
+                            },
+                            "filename": {
+                              "type": "string"
+                            },
+                            "size": {
+                              "type": "integer",
+                              "format": "int64"
+                            },
+                            "content_type": {
+                              "type": "string"
+                            },
+                            "private": {
+                              "type": "boolean"
+                            },
+                            "max_size": {
+                              "type": "integer",
+                              "format": "int64"
+                            },
+                            "download_path": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Four concurrent uploads are already active. Retry after two seconds."
+          }
+        },
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "file"
+                ],
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  },
+                  "purpose": {
+                    "type": "string",
+                    "enum": [
+                      "image",
+                      "attachment"
+                    ]
+                  },
+                  "directory": {
+                    "type": "string",
+                    "deprecated": true,
+                    "description": "Accepted for legacy compatibility; never used as an object path."
+                  },
+                  "param": {
+                    "type": "string",
+                    "deprecated": true,
+                    "description": "Accepted for legacy compatibility; never used as an object path."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "description": "Authenticated multipart upload. PNG/JPEG/WebP remain public images (10 MiB); purpose=attachment makes any file private. Other content is private automatically. Attachment maximum is configurable (50 MiB default). directory and param are accepted but ignored for storage paths.",
+        "parameters": [
+          {
+            "name": "tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Selected context; omitted or zero uses the current membership default."
+          },
+          {
+            "name": "app-id",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Selected context; omitted or zero uses the current membership default."
+          }
+        ]
+      }
+    },
+    "/app/file/limits": {
+      "get": {
+        "operationId": "get_app_file_limits",
+        "summary": "Read configured upload limits",
+        "x-public": true,
+        "responses": {
+          "200": {
+            "description": "Limits in bytes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/Envelope"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "image_max_bytes": {
+                              "type": "integer",
+                              "format": "int64"
+                            },
+                            "attachment_max_bytes": {
+                              "type": "integer",
+                              "format": "int64"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/app/file/download": {
+      "get": {
+        "operationId": "get_app_file_download",
+        "summary": "Download an authorized file as an attachment",
+        "description": "Requires current tenant/app access. Supply id or key (both must match if supplied together). Use fetch with access-token and context headers, then create a local Blob URL. Never put the token in the URL. Private files cannot be fetched using /files/ or legacy static delivery.",
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Selected context; omitted or zero uses the current membership default."
+          },
+          {
+            "name": "app-id",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Selected context; omitted or zero uses the current membership default."
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Binary attachment (UTF-8 filename supported)",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment with filename or RFC 5987 filename*"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid session"
+          },
+          "403": {
+            "description": "Current tenant/app access disabled, expired or revoked"
+          },
+          "404": {
+            "description": "File absent, unconfirmed, or outside selected tenant/app"
+          }
+        }
+      },
+      "head": {
+        "operationId": "head_app_file_download",
+        "summary": "Download an authorized file as an attachment",
+        "description": "Requires current tenant/app access. Supply id or key (both must match if supplied together). Use fetch with access-token and context headers, then create a local Blob URL. Never put the token in the URL. Private files cannot be fetched using /files/ or legacy static delivery.",
+        "security": [
+          {
+            "accessToken": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "tenant-id",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Selected context; omitted or zero uses the current membership default."
+          },
+          {
+            "name": "app-id",
+            "in": "header",
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Selected context; omitted or zero uses the current membership default."
+          },
+          {
+            "name": "key",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "id",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Binary attachment (UTF-8 filename supported)",
+            "headers": {
+              "Content-Disposition": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "attachment with filename or RFC 5987 filename*"
+              },
+              "Cache-Control": {
+                "schema": {
+                  "type": "string",
+                  "enum": [
+                    "private, no-store"
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid session"
+          },
+          "403": {
+            "description": "Current tenant/app access disabled, expired or revoked"
+          },
+          "404": {
+            "description": "File absent, unconfirmed, or outside selected tenant/app"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "accessToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "access-token"
+      }
+    },
+    "schemas": {
+      "Envelope": {
+        "type": "object",
+        "required": [
+          "code",
+          "data",
+          "msg",
+          "mesc"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer"
+          },
+          "data": {},
+          "msg": {
+            "type": "string"
+          },
+          "mesc": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
