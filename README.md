@@ -1,6 +1,6 @@
 # Kerthus
 
-基于 **go-micro v6** 的多租户 SaaS 基础底座。后端迁移自 `service.beehive` 的基础服务逻辑，管理台复用 `dating.saas` 的 Vue 3 / Vben 页面。当前已实现可运行的首期闭环；不包含婚恋、CRM、呼叫中心或支付业务。
+基于 **go-micro v6** 的 Kerthus 多租户应用平台基础底座。当前已实现可运行的首期闭环，支持账号、租户、组织、应用、资源和权限管理，并为后续独立应用接入预留扩展边界。
 
 ```mermaid
 flowchart LR
@@ -15,7 +15,7 @@ flowchart LR
     REG -.-> CORE
 ```
 
-## 当前工作区已沿用原数据
+## 当前工作区数据
 
 已从本机 `3306/beehive_saas` 导入 `3306/kerthus_saas` 并切换运行配置：62 个账号、45 个租户、3567 条地区数据及原组织/角色关系。原库保持不变。当前启动用 `make dev`，使用原系统手机号和密码登录；不要重复初始化默认种子。详细范围、备份及转换见 [数据迁入说明](docs/migration/legacy-data-import.md)。
 
@@ -36,7 +36,7 @@ make dev
 - RPC：`127.0.0.1:19090`，服务名 `kerthus.saas`
 - MySQL `13306`、Redis `16379`、Consul `18500`、MinIO `19000/19001`，均绑定本地回环地址。
 
-`make infra` 自动生成 `.local/saas.env`，权限为 0600。管理员手机号由 `KERTHUS_ADMIN_PHONE` 指定；随机密码见同文件 `KERTHUS_ADMIN_PASSWORD`。不会复用旧项目凭据。重复 seed 不重置密码、不提升已有普通账号，也不恢复被停用的管理员。
+`make infra` 自动生成 `.local/saas.env`，权限为 0600。管理员手机号由 `KERTHUS_ADMIN_PHONE` 指定；随机密码见同文件 `KERTHUS_ADMIN_PASSWORD`。重复 seed 不重置密码、不提升已有普通账号，也不恢复被停用的管理员。
 
 `make dev` 同时运行核心、网关和前端，Ctrl-C 结束这三个子进程。也可以分别运行 `make saas`、`make gateway`、`make web`。启动前停止占用相同端口的开发进程。`make stop-infra` 停止依赖，保留数据卷。
 
