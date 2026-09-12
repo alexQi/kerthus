@@ -169,11 +169,10 @@
       });
 
       const getLogoWidth = computed(() => {
-        if (!unref(getIsMixMode) || unref(getIsMobile)) {
+        if (unref(getIsMobile)) {
           return {};
         }
-        const width = unref(getMenuWidth) < 180 ? 180 : unref(getMenuWidth);
-        return { width: `${width}px` };
+        return { width: `${unref(getMenuWidth)}px`, minWidth: `${unref(getMenuWidth)}px` };
       });
 
       const getSplitType = computed(() => {
