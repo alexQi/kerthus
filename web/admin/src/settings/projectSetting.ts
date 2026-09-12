@@ -95,7 +95,7 @@ const setting: ProjectConfig = {
     // Whether to show dom
     hidden: false,
     // Menu width
-    menuWidth: 160,
+    menuWidth: 240,
     // Menu mode
     mode: MenuModeEnum.INLINE,
     // Menu type
