@@ -6,15 +6,22 @@
     <a-drawer v-model:visible="open" title="Agent 对话" placement="right" :width="drawerWidth" :body-style="{ padding: 0 }" :destroy-on-close="false">
       <template #extra><a-button type="link" :disabled="loading || sessionLoading" @click="newConversation">新对话</a-button></template>
       <div class="agent-layout">
-        <aside class="agent-sessions">
+        <aside :class="['agent-sessions', { collapsed: sessionsCollapsed }]">
           <div class="agent-sessions-header">
-            <span>对话列表</span>
-            <a-button type="link" size="small" :disabled="loading || sessionLoading" @click="newConversation">新对话</a-button>
+            <span v-if="!sessionsCollapsed">对话列表</span>
+            <div v-if="!sessionsCollapsed" class="agent-sessions-actions">
+              <a-button type="link" size="small" :disabled="loading || sessionLoading" @click="newConversation">新对话</a-button>
+              <a-button type="text" size="small" aria-label="折叠对话列表" @click="sessionsCollapsed = true"><MenuFoldOutlined /></a-button>
+            </div>
+            <a-button v-else type="text" size="small" aria-label="展开对话列表" @click="sessionsCollapsed = false"><MenuUnfoldOutlined /></a-button>
           </div>
-          <div v-if="!sessions.length" class="agent-sessions-empty">暂无历史对话</div>
+          <div v-if="!sessions.length && !sessionsCollapsed" class="agent-sessions-empty">暂无历史对话</div>
           <button v-for="item in sessions" :key="item.session_id" type="button" :class="['agent-session-item', { active: item.session_id === sessionId }]" @click="selectSession(item)">
-            <span class="agent-session-title">{{ item.title }}</span>
-            <span class="agent-session-meta">{{ item.message_count ? `${Math.ceil(item.message_count / 2)} 轮对话 · ` : '' }}{{ formatSessionTime(item.updated_at) }}</span>
+            <MessageOutlined class="agent-session-icon" />
+            <span v-if="!sessionsCollapsed" class="agent-session-copy">
+              <span class="agent-session-title">{{ item.title }}</span>
+              <span class="agent-session-meta">{{ item.message_count ? `${Math.ceil(item.message_count / 2)} 轮对话 · ` : '' }}{{ formatSessionTime(item.updated_at) }}</span>
+            </span>
           </button>
         </aside>
         <section class="agent-chat">
@@ -33,11 +40,15 @@
               </div>
             </div>
           </div>
+          <div class="agent-composer">
+            <a-textarea v-model:value="draft" :rows="2" :placeholder="loading ? '正在等待回复…' : '输入消息，Shift+Enter 换行'" :disabled="sessionLoading" @keydown="handleComposerKeydown" />
+            <a-button class="agent-send" type="primary" :danger="loading" :loading="false" :disabled="!loading && !draft.trim()" @click="loading ? stop : send">
+              <template #icon><StopOutlined v-if="loading" /><SendOutlined v-else /></template>
+              {{ loading ? '停止' : '发送' }}
+            </a-button>
+          </div>
         </section>
       </div>
-      <template #footer>
-        <a-input-search v-model:value="draft" enter-button="发送" :loading="loading" @search="send" />
-      </template>
     </a-drawer>
   </div>
 </template>
@@ -45,8 +56,8 @@
 <script lang="ts">
   import { computed, defineComponent, nextTick, onBeforeUnmount, ref, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import { Button, Drawer, Empty, InputSearch } from 'ant-design-vue';
-  import { LoadingOutlined, MessageOutlined } from '@ant-design/icons-vue';
+  import { Button, Drawer, Empty, Textarea } from 'ant-design-vue';
+  import { LoadingOutlined, MenuFoldOutlined, MenuUnfoldOutlined, MessageOutlined, SendOutlined, StopOutlined } from '@ant-design/icons-vue';
   import { MarkdownViewer } from '/@/components/Markdown';
   import { getSaasConf, getToken } from '/@/utils/auth';
   import { useGlobSetting } from '/@/hooks/setting';
@@ -56,7 +67,7 @@
 
   export default defineComponent({
     name: 'AgentHost',
-    components: { AButton: Button, ADrawer: Drawer, AEmpty: Empty, AInputSearch: InputSearch, LoadingOutlined, MessageOutlined, MarkdownViewer },
+    components: { AButton: Button, ADrawer: Drawer, AEmpty: Empty, ATextarea: Textarea, LoadingOutlined, MenuFoldOutlined, MenuUnfoldOutlined, MessageOutlined, SendOutlined, StopOutlined, MarkdownViewer },
     setup() {
       const route = useRoute();
       const router = useRouter();
@@ -72,8 +83,10 @@
       const progress = ref('正在生成…');
       const messageContainer = ref<HTMLElement | null>(null);
       const activeController = ref<AbortController | null>(null);
+      const stopRequested = ref(false);
       const messages = ref<{ role: string; text: string }[]>([]);
       const sessions = ref<SessionSummary[]>([]);
+      const sessionsCollapsed = ref(false);
       const getSessionScope = () => {
         const conf: any = getSaasConf() || {};
         const token: any = getToken() || {};
@@ -227,9 +240,21 @@
         scrollToBottom();
       };
 
+      const stop = () => {
+        if (!loading.value) return;
+        stopRequested.value = true;
+        activeController.value?.abort();
+      };
+      const handleComposerKeydown = (event: KeyboardEvent) => {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault();
+          if (!loading.value) void send();
+        }
+      };
       const send = async () => {
         const text = draft.value.trim();
         if (!text || loading.value) return;
+        stopRequested.value = false;
         loading.value = true; progress.value = '正在生成…';
         const controller = new AbortController();
         activeController.value = controller;
@@ -296,11 +321,12 @@
         } catch (error: any) {
           const pending = messages.value[messages.value.length - 1];
           if (pending?.role === 'assistant' && !pending.text) messages.value.pop();
-          const message = error?.name === 'AbortError' ? 'Agent 响应超时，请重试' : error?.message || 'Agent 请求失败';
+          const message = stopRequested.value ? '已停止生成' : error?.name === 'AbortError' ? 'Agent 响应超时，请重试' : error?.message || 'Agent 请求失败';
           messages.value.push({ role: 'error', text: message });
         } finally {
           window.clearTimeout(timeoutId);
           if (activeController.value === controller) activeController.value = null;
+          stopRequested.value = false;
           loading.value = false;
         }
       };
@@ -311,7 +337,7 @@
         sessionId.value = '';
         sessionScope.value = '';
       });
-      return { open, drawerWidth, loading, sessionLoading, draft, messages, progress, messageContainer, sessions, sessionId, send, newConversation, selectSession, formatSessionTime };
+      return { open, drawerWidth, loading, sessionLoading, draft, messages, progress, messageContainer, sessions, sessionsCollapsed, sessionId, send, stop, handleComposerKeydown, newConversation, selectSession, formatSessionTime };
     },
   });
 </script>
@@ -319,17 +345,25 @@
 <style scoped lang="less">
   .agent-trigger { position: fixed; right: 24px; bottom: 24px; z-index: 1000; box-shadow: 0 4px 16px rgb(0 0 0 / 20%); }
   .agent-layout { display: flex; height: 100%; min-height: 0; margin: 0; }
-  .agent-sessions { width: 220px; flex: 0 0 220px; padding: 20px 16px; border-right: 1px solid #f0f0f0; overflow-y: auto; }
+  .agent-sessions { width: 220px; flex: 0 0 220px; padding: 20px 16px; border-right: 1px solid #f0f0f0; overflow-y: auto; transition: width 0.2s, flex-basis 0.2s, padding 0.2s; }
+  .agent-sessions.collapsed { width: 56px; flex-basis: 56px; padding: 20px 8px; }
   .agent-sessions-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; color: var(--text-color-base, rgb(0 0 0 / 88%)); font-size: 13px; font-weight: 600; }
+  .agent-sessions-actions { display: inline-flex; align-items: center; gap: 2px; }
   .agent-sessions-empty { padding: 20px 8px; color: rgb(0 0 0 / 45%); font-size: 12px; text-align: center; }
-  .agent-session-item { display: flex; flex-direction: column; width: 100%; margin-bottom: 4px; padding: 9px 10px; border: 0; border-radius: 8px; color: var(--text-color-base, rgb(0 0 0 / 88%)); background: transparent; cursor: pointer; text-align: left; transition: background 0.2s; }
+  .agent-session-item { display: flex; align-items: center; width: 100%; margin-bottom: 4px; padding: 9px 10px; border: 0; border-radius: 8px; color: var(--text-color-base, rgb(0 0 0 / 88%)); background: transparent; cursor: pointer; text-align: left; transition: background 0.2s; }
+  .agent-sessions.collapsed .agent-session-item { justify-content: center; padding: 10px 8px; }
+  .agent-session-icon { flex: 0 0 auto; font-size: 16px; }
+  .agent-session-copy { display: flex; min-width: 0; flex: 1; flex-direction: column; margin-left: 8px; }
   .agent-session-item:hover { background: #f5f5f5; }
   .agent-session-item.active { color: #1677ff; background: #e6f4ff; }
   .agent-session-title { overflow: hidden; font-size: 13px; line-height: 1.45; text-overflow: ellipsis; white-space: nowrap; }
   .agent-session-meta { margin-top: 3px; color: rgb(0 0 0 / 45%); font-size: 11px; }
-  .agent-chat { display: flex; min-width: 0; flex: 1; flex-direction: column; padding: 20px 28px; }
+  .agent-chat { display: flex; min-width: 0; flex: 1; flex-direction: column; padding: 20px 28px 16px; }
   .agent-history-title { margin-bottom: 16px; color: var(--text-color-base, rgb(0 0 0 / 88%)); font-size: 15px; font-weight: 600; }
   .agent-messages { display: flex; min-height: 0; flex: 1; flex-direction: column; gap: 14px; overflow-y: auto; padding: 2px 4px 12px 0; }
+  .agent-composer { display: flex; flex: 0 0 auto; align-items: flex-end; gap: 10px; padding-top: 12px; border-top: 1px solid #f0f0f0; }
+  .agent-composer :deep(.ant-input) { flex: 1; resize: none; }
+  .agent-send { flex: 0 0 76px; height: 56px; }
   .agent-messages :deep(.vditor-reset) { padding: 0; background: transparent; font-size: 14px; line-height: 1.65; }
   .agent-messages :deep(.vditor-reset > :first-child) { margin-top: 0; }
   .agent-messages :deep(.vditor-reset > :last-child) { margin-bottom: 0; }
@@ -344,6 +378,7 @@
   .agent-message-row.error .agent-message { color: #d4380d; background: #fff2e8; }
   html[data-theme='dark'] .agent-history-title { color: rgb(255 255 255 / 85%); }
   html[data-theme='dark'] .agent-sessions { border-right-color: #303030; }
+  html[data-theme='dark'] .agent-composer { border-top-color: #303030; }
   html[data-theme='dark'] .agent-sessions-header { color: rgb(255 255 255 / 85%); }
   html[data-theme='dark'] .agent-sessions-empty { color: rgb(255 255 255 / 45%); }
   html[data-theme='dark'] .agent-session-item { color: rgb(255 255 255 / 85%); }
@@ -356,7 +391,8 @@
   html[data-theme='dark'] .agent-message-row.user .agent-message { color: #fff; background: #1677ff; }
   html[data-theme='dark'] .agent-message-row.error .agent-message { color: #ffb7b2; background: #2b1d1b; }
   @media (max-width: 560px) {
-    .agent-sessions { width: 160px; flex-basis: 160px; padding: 16px 10px; }
+    .agent-sessions { width: 180px; flex-basis: 180px; padding: 16px 10px; }
+    .agent-sessions.collapsed { width: 52px; flex-basis: 52px; padding: 16px 6px; }
     .agent-chat { padding: 16px; }
     .agent-trigger { right: 16px; bottom: 16px; }
   }
