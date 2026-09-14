@@ -4,7 +4,7 @@
   "name": "企业管理",
   "release_version": "1.0.0",
   "platform_api_version": "v1",
-  "resource_version": 6,
+  "resource_version": 7,
   "http_contract": "api/http/legacy.openapi.yaml",
   "service_key": "kerthus.saas",
   "route_prefix": "/system",
@@ -305,14 +305,14 @@
     {
       "code": "basic:system:provider",
       "parent_code": "basic:system",
-      "name": "Agent 提供商",
+      "name": "模型提供商",
       "type": "view",
       "path": "/basic/system/provider",
       "component": "system/features/agentProvider/index",
       "sort": 2,
       "icon": "mdi:robot-outline",
       "meta": {
-        "title": "Agent 提供商"
+        "title": "模型提供商"
       }
     }
   ]
