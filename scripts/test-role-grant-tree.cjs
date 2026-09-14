@@ -17,24 +17,32 @@ const file = path.join(root, 'web/admin/src/views/basic/system/role/resources.vu
 const { descriptor } = parse(fs.readFileSync(file, 'utf8'));
 const granted = [10, 11, 12];
 const allIds = [10, 11, 12, 13, 14, 15];
-const fixtureTree = [{ key: 10, id: 10, title: '企业管理', children: [
+const fixtureTree = [{ key: 10, id: 10, title: '用户中心', children: [
   { key: 11, id: 11, title: '首页' }, { key: 12, id: 12, title: '组织' },
   { key: 13, id: 13, title: '成员' }, { key: 14, id: 14, title: '岗位' },
   { key: 15, id: 15, title: '角色' },
 ] }];
 let loading;
+let reloadResources;
+let administrator = false;
 const emitted = [];
 const moduleRef = { exports: {} };
+const externalModule = { exports: {} };
+vm.runInNewContext(esbuild.transformSync(
+  fs.readFileSync(path.join(root, 'web/admin/src/utils/externalUrl.ts'), 'utf8'),
+  { loader: 'ts', format: 'cjs' },
+).code, { exports: externalModule.exports, module: externalModule });
 const dependencies = {
-  vue: { ...vue, watch: (_source, callback) => { loading = callback(); } },
+  vue: { ...vue, watch: (_source, callback) => { reloadResources = callback; loading = callback(); } },
   'ant-design-vue': adminRequire('ant-design-vue'),
   '/@/components/Container': { CollapseContainer: {} },
   '/@/components/Tree': { BasicTree: {} },
   '/@/api/application/application': { getTenantResources: async () => ({ 2: { id: 2, ids: allIds, resources: fixtureTree } }) },
-  '/@/api/tenant/role': { queryRoleResources: async () => ({ resource_ids: { 2: granted }, resource_map: { 2: { 10: 1, 11: 5, 12: 2 } } }) },
-  '/@/constants/employ': { scopeOptions: {} },
+  '/@/api/tenant/role': { queryRoleResources: async () => ({ administrator, resource_ids: { 2: granted }, resource_map: { 2: { 10: 1, 11: 5, 12: 2 } } }) },
+  '/@/constants/employ': { scopeOptions: { 1: { label: '全部', value: 1 } } },
   '/@/store/modules/user': { useUserStore: () => ({ getSaasConf: { tenant_id: 1 } }) },
   '/@/utils/helper/treeHelper': { getChildrenIds: () => [] },
+  '/@/utils/externalUrl': externalModule.exports,
 };
 const compiled = esbuild.transformSync(descriptor.script.content, { loader: 'ts', format: 'cjs' }).code;
 vm.runInNewContext(compiled, { exports: moduleRef.exports, module: moduleRef, require: (id) => {
@@ -75,6 +83,25 @@ async function checkedCount(checkStrictly, checkedKeys) {
   assert.equal(await checkedCount(true, saved()), allIds.length);
   state.onCheckAllChange({ target: { value: 2, checked: false } });
   assert.deepEqual(saved(), [], 'Explicit clear all remains available');
+  const staleScopeMenu = state.getRightMenus({ app_id: 2, id: 12, dataRef: { children: [] } });
+  administrator = true;
+  await reloadResources();
+  assert.equal(state.readonly.value, true, 'Protected role permissions are read-only');
+  assert.equal(emitted.filter(([event]) => event === 'readonly').at(-1)[1], true);
+  assert.deepEqual(saved(), granted, 'Protected role still displays its stored grants');
+  state.handleCheck({ checked: [10], halfChecked: [] }, null, 2);
+  state.onCheckAllChange({ target: { value: 2, checked: false } });
+  state.onCheckAllChange({ target: { value: 2, checked: true } });
+  assert.deepEqual(saved(), granted, 'Individual, clear-all and select-all cannot change a protected role');
+  assert.equal(state.getRightMenus({ app_id: 2, id: 12 }).length, 0, 'No scope menu for protected roles');
+  staleScopeMenu[0].handler();
+  assert.equal(state.roleState.value[2].scope[12], 2, 'A scope menu opened before switching roles cannot change a protected role');
+  administrator = false;
+  await reloadResources();
+  assert.equal(state.readonly.value, false, 'Switching back to a business role restores editing');
+  assert.equal(emitted.filter(([event]) => event === 'readonly').at(-1)[1], false);
+  state.handleCheck({ checked: [10, 11, 12, 13], halfChecked: [] }, null, 2);
+  assert.deepEqual(saved(), [10, 11, 12, 13]);
   const appFile = path.join(root, 'web/admin/src/views/system/application/auth/resources.vue');
   const appDescriptor = parse(fs.readFileSync(appFile, 'utf8')).descriptor;
   const appTree = findTree(baseParse(appDescriptor.template.content));
@@ -115,5 +142,5 @@ async function checkedCount(checkStrictly, checkedKeys) {
   assert.deepEqual(appSaved(), []);
   const tenantRoleWrapper = fs.readFileSync(path.join(root, 'web/admin/src/views/system/tenant/detail/components/roles/resources.vue'), 'utf8');
   assert.ok(tenantRoleWrapper.includes("from '/@/views/basic/system/role/resources.vue'"), 'Tenant detail roles reuse the protected role grant tree');
-  console.log('PASS: exact role and tenant-app grants, non-cascading rendering, preserved scope/TTL, explicit selection and select/clear all');
+  console.log('PASS: exact role and tenant-app grants, protected role read-only state, business-role switching, preserved scope/TTL and explicit selection');
 })().catch((error) => { console.error(error); process.exitCode = 1; });

@@ -4,6 +4,7 @@
     :tenantId="fetchParams.id"
     @select="$emit('select', $event)"
     @loading="$emit('loading', $event)"
+    @readonly="$emit('readonly', $event)"
   />
 </template>
 <script lang="ts">
@@ -16,6 +17,6 @@
       roleId: { type: [Number, String] as PropType<number | string>, default: 0 },
       fetchParams: { type: Object as PropType<any>, default: () => ({}) },
     },
-    emits: ['select', 'loading'],
+    emits: ['select', 'loading', 'readonly'],
   });
 </script>

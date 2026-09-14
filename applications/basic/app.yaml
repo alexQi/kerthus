@@ -4,7 +4,7 @@
   "name": "企业管理",
   "release_version": "1.0.0",
   "platform_api_version": "v1",
-  "resource_version": 7,
+  "resource_version": 8,
   "http_contract": "api/http/legacy.openapi.yaml",
   "service_key": "kerthus.saas",
   "route_prefix": "/system",
@@ -104,7 +104,7 @@
     },
     {
       "code": "basic:user:role",
-      "parent_code": "basic:system",
+      "parent_code": "basic:user",
       "name": "角色管理",
       "type": "menu",
       "path": "/basic/system/role",

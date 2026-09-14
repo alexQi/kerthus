@@ -6,7 +6,13 @@
         <template #tabBarExtraContent>
           <a-button
             v-auth="['system:tenant:detail:role:authRoleResource']"
-            :disabled="activeTab === 'user' || !Number(roleId) || resourcesLoading || saving"
+            :disabled="
+              activeTab === 'user' ||
+              !Number(roleId) ||
+              resourcesLoading ||
+              resourcesReadonly ||
+              saving
+            "
             :loading="saving"
             class="ml-2"
             type="primary"
@@ -21,6 +27,7 @@
           :fetchParams="fetchParams"
           @select="handleSelectResources"
           @loading="resourcesLoading = $event"
+          @readonly="resourcesReadonly = $event"
         />
         <Users v-if="activeTab === 'user'" :roleId="roleId" :fetchParams="fetchParams" />
       </Card>
@@ -68,6 +75,7 @@
       const roleId = ref<number | string>(0);
       const roleState = ref<any>({});
       const resourcesLoading = ref(true);
+      const resourcesReadonly = ref(false);
       const saving = ref(false);
 
       function handleSelectRole(id) {
@@ -83,7 +91,8 @@
       }
 
       async function handleSubmit() {
-        if (!roleId.value || resourcesLoading.value || saving.value) return;
+        if (!roleId.value || resourcesLoading.value || resourcesReadonly.value || saving.value)
+          return;
         const params = {
           tenant_id: props.fetchParams.id,
           role_id: roleId.value,
@@ -112,6 +121,7 @@
         activeTab,
         roleId,
         resourcesLoading,
+        resourcesReadonly,
         saving,
         handleTabChange,
         handleSelectRole,

@@ -41,6 +41,21 @@ func resourceTree(resources []*pb.Resource, navigation bool) []any {
 	}
 	return genericTree(nodes)
 }
+
+func authorizationResources(app *pb.App, resources []*pb.Resource) []*pb.Resource {
+	items := make([]*pb.Resource, 0, len(resources))
+	for _, resource := range resources {
+		// The application is already the group heading. Its layout root is
+		// structural, not a permission; Auth restores ancestors for routing.
+		if resource.Code == app.Code+":root" && resource.ParentId == 0 &&
+			resource.Type == "menu" && resource.Component == "LAYOUT" {
+			continue
+		}
+		items = append(items, resource)
+	}
+	return items
+}
+
 func genericTree(items []any) []any {
 	nodes := map[int64]payload{}
 	order := []int64{}
@@ -96,7 +111,7 @@ func (g *Gateway) registerCatalog() {
 			}
 			out := map[string]any{}
 			for _, a := range apps.Apps {
-				rs := grouped[a.Id]
+				rs := authorizationResources(a, grouped[a.Id])
 				if len(rs) == 0 && a.Type != "third" {
 					continue
 				}
@@ -271,7 +286,7 @@ func (g *Gateway) registerGrants() {
 			}
 			scopes[aid][strconv.FormatInt(v.ResourceId, 10)] = v.DataScope
 		}
-		return payload{"resource_ids": ids, "resource_map": scopes}, nil
+		return payload{"resource_ids": ids, "resource_map": scopes, "administrator": r.Roles[0].Administrator}, nil
 	})
 	g.add("POST", "/system/role/authRoleResource", true, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
 		req := &pb.RoleResourcesRequest{Context: c, TenantId: p.num("tenant_id"), RoleId: p.num("role_id")}

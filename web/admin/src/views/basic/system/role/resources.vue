@@ -1,5 +1,12 @@
 <template>
   <div class="overflow-hidden">
+    <Alert
+      v-if="readonly"
+      class="mb-4"
+      type="info"
+      showIcon
+      message="基础管理员角色的应用权限为只读。如需自定义权限，请新增业务角色。"
+    />
     <CollapseContainer
       v-for="(item, index) in appResources"
       :key="index"
@@ -11,7 +18,7 @@
             :checked="roleState[index].checkAll"
             :indeterminate="roleState[index].indeterminate"
             @change="onCheckAllChange"
-            :disabled="!Number(roleId) || loading"
+            :disabled="!Number(roleId) || loading || readonly"
             :value="item.id"
           />
           <span class="ml-1 mr-12">{{ item.name }}</span>
@@ -24,7 +31,7 @@
         checkStrictly
         :allowCheckStrictlyChange="false"
         treeWrapperClassName="h-[calc(100%-35px)] overflow-auto mt-2"
-        :disabled="!Number(roleId) || loading"
+        :disabled="!Number(roleId) || loading || readonly"
         :clickRowToExpand="false"
         :loading="loading"
         :treeData="item['resources']"
@@ -59,7 +66,7 @@
 </template>
 <script lang="ts">
   import { defineComponent, PropType, ref, watch } from 'vue';
-  import { Checkbox, Tag } from 'ant-design-vue';
+  import { Alert, Checkbox, Tag } from 'ant-design-vue';
   import { CollapseContainer } from '/@/components/Container';
   import { BasicTree, ContextMenuItem } from '/@/components/Tree';
   import { getTenantResources } from '/@/api/application/application';
@@ -71,6 +78,7 @@
   export default defineComponent({
     name: 'RoleResource',
     components: {
+      Alert,
       Tag,
       Checkbox,
       BasicTree,
@@ -86,7 +94,7 @@
         default: 0,
       },
     },
-    emits: ['select', 'loading'],
+    emits: ['select', 'loading', 'readonly'],
     setup(props, { emit }) {
       const resourceTypeMap = {
         menu: {
@@ -107,15 +115,18 @@
         },
       };
       const loading = ref<boolean>(false);
+      const readonly = ref(false);
       const roleState = ref<any>({});
       const appResources = ref<any>({});
 
       function getRightMenus(node: any): ContextMenuItem[] {
+        if (readonly.value || loading.value || !Number(props.roleId)) return [];
         const rightMenus: any[] = [];
         for (const optionKey in scopeOptions) {
           rightMenus.push({
             label: scopeOptions[optionKey].label,
             handler: () => {
+              if (readonly.value || loading.value || !Number(props.roleId)) return;
               roleState.value[node.app_id].scope[node.id] = scopeOptions[optionKey].value;
               const childIds = getChildrenIds(node.dataRef.children);
               for (const childId of childIds) {
@@ -135,7 +146,7 @@
 
       function updateSelection(appId, keys) {
         const state = roleState.value[appId];
-        if (!state || loading.value) return;
+        if (!state || loading.value || readonly.value) return;
         const selected = [...new Set(keys)];
         if (
           selected.length === state.checkedList.length &&
@@ -177,6 +188,8 @@
             props.roleId ? queryRoleResources({ ...params, role_id: props.roleId }) : null,
           ]);
           if (version !== requestVersion) return;
+          readonly.value = !!grants?.administrator;
+          emit('readonly', readonly.value);
           const states = {};
           for (const appId in resources) {
             const ids = resources[appId].ids;
@@ -208,6 +221,7 @@
         roleState,
         resourceTypeMap,
         loading,
+        readonly,
         appResources,
         getRightMenus,
         onCheckAllChange,
