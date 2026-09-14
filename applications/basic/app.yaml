@@ -4,7 +4,7 @@
   "name": "企业管理",
   "release_version": "1.0.0",
   "platform_api_version": "v1",
-  "resource_version": 2,
+  "resource_version": 6,
   "http_contract": "api/http/legacy.openapi.yaml",
   "service_key": "kerthus.saas",
   "route_prefix": "/system",
@@ -17,133 +17,303 @@
       "type": "menu",
       "path": "/basic",
       "component": "LAYOUT",
-      "sort": 0
+      "sort": 0,
+      "icon": "",
+      "meta": {}
     },
     {
-      "code": "basic:home",
+      "code": "basic:dashboard",
       "parent_code": "basic:root",
-      "name": "工作台",
-      "type": "view",
+      "name": "首页",
+      "type": "menu",
       "path": "/basic/dashboard",
       "component": "common/dashboard/index",
-      "sort": 1
+      "sort": 1,
+      "icon": "mdi:view-dashboard-edit"
     },
     {
-      "code": "basic:members",
+      "code": "basic:application",
       "parent_code": "basic:root",
-      "name": "成员管理",
-      "type": "view",
-      "path": "/basic/members",
+      "name": "应用管理",
+      "type": "menu",
+      "path": "/basic/application",
+      "component": "LAYOUT",
+      "sort": 10,
+      "icon": "mdi:application-cog",
+      "redirect": "/basic/application/index"
+    },
+    {
+      "code": "basic:user",
+      "parent_code": "basic:root",
+      "name": "用户中心",
+      "type": "menu",
+      "path": "/basic/user",
+      "component": "LAYOUT",
+      "sort": 20,
+      "icon": "mdi:account-settings-variant"
+    },
+    {
+      "code": "basic:system",
+      "parent_code": "basic:root",
+      "name": "系统功能",
+      "type": "menu",
+      "path": "/basic/system",
+      "component": "LAYOUT",
+      "sort": 30,
+      "icon": "mdi:police-badge"
+    },
+    {
+      "code": "basic:application:main",
+      "parent_code": "basic:application",
+      "name": "我的应用",
+      "type": "menu",
+      "path": "/basic/application/index",
+      "component": "basic/application/main/index",
+      "sort": 1,
+      "icon": "mdi:apps"
+    },
+    {
+      "code": "basic:user:main",
+      "parent_code": "basic:user",
+      "name": "员工维护",
+      "type": "menu",
+      "path": "/basic/user/index",
       "component": "basic/user/main/index",
-      "sort": 2
+      "sort": 1,
+      "icon": "mdi:account-injury"
     },
     {
-      "code": "basic:organizations",
-      "parent_code": "basic:root",
-      "name": "组织管理",
-      "type": "view",
-      "path": "/basic/organizations",
+      "code": "basic:user:org",
+      "parent_code": "basic:user",
+      "name": "组织维护",
+      "type": "menu",
+      "path": "/basic/user/org",
       "component": "basic/user/org/index",
-      "sort": 3
+      "sort": 1,
+      "icon": "mdi:basecamp"
     },
     {
-      "code": "basic:positions",
-      "parent_code": "basic:root",
-      "name": "岗位管理",
-      "type": "view",
-      "path": "/basic/positions",
+      "code": "basic:user:position",
+      "parent_code": "basic:user",
+      "name": "岗位维护",
+      "type": "menu",
+      "path": "/basic/user/position",
       "component": "basic/user/position/index",
-      "sort": 4
+      "sort": 1,
+      "icon": "mdi:family-tree"
     },
     {
-      "code": "basic:roles",
-      "parent_code": "basic:root",
-      "name": "角色权限",
-      "type": "view",
-      "path": "/basic/roles",
+      "code": "basic:user:role",
+      "parent_code": "basic:system",
+      "name": "角色管理",
+      "type": "menu",
+      "path": "/basic/system/role",
       "component": "basic/system/role/index",
-      "sort": 5
+      "sort": 1,
+      "icon": "mdi:two-factor-authentication"
     },
     {
-      "code": "basic:audit",
-      "parent_code": "basic:root",
-      "name": "操作审计",
-      "type": "view",
-      "path": "/basic/audit",
-      "component": "basic/system/audit/index",
-      "sort": 6
+      "code": "basic:application:main:query",
+      "parent_code": "basic:application:main",
+      "name": "查询",
+      "type": "action",
+      "path": "/basic/application/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
-      "code": "basic:user:role:authRoleResource",
-      "parent_code": "basic:root",
-      "name": "basic:user:role:authRoleResource",
-      "type": "action"
+      "code": "basic:user:main:query",
+      "parent_code": "basic:user:main",
+      "name": "查询",
+      "type": "action",
+      "path": "/basic/user/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
-      "code": "basic:user:role:delete",
-      "parent_code": "basic:root",
-      "name": "basic:user:role:delete",
-      "type": "action"
-    },
-    {
-      "code": "basic:user:role:save",
-      "parent_code": "basic:root",
-      "name": "basic:user:role:save",
-      "type": "action"
-    },
-    {
-      "code": "basic:user:role:relateEmployee",
-      "parent_code": "basic:root",
-      "name": "basic:user:role:relateEmployee",
-      "type": "action"
-    },
-    {
-      "code": "basic:user:org:delete",
-      "parent_code": "basic:root",
-      "name": "basic:user:org:delete",
-      "type": "action"
-    },
-    {
-      "code": "basic:user:org:save",
-      "parent_code": "basic:root",
-      "name": "basic:user:org:save",
-      "type": "action"
-    },
-    {
-      "code": "basic:user:position:create",
-      "parent_code": "basic:root",
-      "name": "basic:user:position:create",
-      "type": "action"
-    },
-    {
-      "code": "basic:user:position:delete",
-      "parent_code": "basic:root",
-      "name": "basic:user:position:delete",
-      "type": "action"
-    },
-    {
-      "code": "basic:user:position:edit",
-      "parent_code": "basic:root",
-      "name": "basic:user:position:edit",
-      "type": "action"
+      "code": "basic:user:main:setStatus",
+      "parent_code": "basic:user:main",
+      "name": "修改状态",
+      "type": "action",
+      "path": "/basic/user/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
       "code": "basic:user:main:create",
-      "parent_code": "basic:root",
-      "name": "basic:user:main:create",
-      "type": "action"
+      "parent_code": "basic:user:main",
+      "name": "新建员工",
+      "type": "action",
+      "path": "/basic/user/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
       "code": "basic:user:main:edit",
-      "parent_code": "basic:root",
-      "name": "basic:user:main:edit",
-      "type": "action"
+      "parent_code": "basic:user:main",
+      "name": "修改员工",
+      "type": "action",
+      "path": "/basic/user/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
       "code": "basic:user:main:resetPassword",
-      "parent_code": "basic:root",
-      "name": "basic:user:main:resetPassword",
-      "type": "action"
+      "parent_code": "basic:user:main",
+      "name": "重置密码",
+      "type": "action",
+      "path": "/basic/user/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:user:org:view",
+      "parent_code": "basic:user:org",
+      "name": "查看详情",
+      "type": "action",
+      "path": "/basic/user/org/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:user:org:save",
+      "parent_code": "basic:user:org",
+      "name": "编辑",
+      "type": "action",
+      "path": "/basic/user/org/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:user:org:delete",
+      "parent_code": "basic:user:org",
+      "name": "删除",
+      "type": "action",
+      "path": "/basic/user/org/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:user:position:create",
+      "parent_code": "basic:user:position",
+      "name": "新增",
+      "type": "action",
+      "path": "/basic/user/position/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:user:position:edit",
+      "parent_code": "basic:user:position",
+      "name": "修改",
+      "type": "action",
+      "path": "/basic/user/position/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:user:position:delete",
+      "parent_code": "basic:user:position",
+      "name": "删除",
+      "type": "action",
+      "path": "/basic/user/position/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:user:position:setStatus",
+      "parent_code": "basic:user:position",
+      "name": "修改状态",
+      "type": "action",
+      "path": "/basic/user/position/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:user:role:query",
+      "parent_code": "basic:user:role",
+      "name": "查询",
+      "type": "action",
+      "path": "/basic/system/role/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:user:role:save",
+      "parent_code": "basic:user:role",
+      "name": "编辑",
+      "type": "action",
+      "path": "/basic/system/role/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:user:role:authRoleResource",
+      "parent_code": "basic:user:role",
+      "name": "资源授权",
+      "type": "action",
+      "path": "/basic/system/role/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:user:role:relateEmployee",
+      "parent_code": "basic:user:role",
+      "name": "绑定员工",
+      "type": "action",
+      "path": "/basic/system/role/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:user:role:delete",
+      "parent_code": "basic:user:role",
+      "name": "删除",
+      "type": "action",
+      "path": "/basic/system/role/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:user:role:setStatus",
+      "parent_code": "basic:user:role",
+      "name": "修改状态",
+      "type": "action",
+      "path": "/basic/system/role/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "basic:system:provider",
+      "parent_code": "basic:system",
+      "name": "Agent 提供商",
+      "type": "view",
+      "path": "/basic/system/provider",
+      "component": "system/features/agentProvider/index",
+      "sort": 2,
+      "icon": "mdi:robot-outline",
+      "meta": {
+        "title": "Agent 提供商"
+      }
     }
   ]
 }

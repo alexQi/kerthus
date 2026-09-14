@@ -122,7 +122,6 @@
         getShowTopMenu,
         getShowHeaderTrigger,
         getSplit,
-        getIsMixMode,
         getMenuWidth,
         getIsMixSidebar,
       } = useMenuSetting();

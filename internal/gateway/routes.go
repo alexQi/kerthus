@@ -55,7 +55,10 @@ func (g *Gateway) register() {
 	}
 	kinds := map[string]pb.Kind{"user": pb.Kind_USERS, "tenant": pb.Kind_TENANTS, "employee": pb.Kind_MEMBERS, "org": pb.Kind_ORGS, "position": pb.Kind_POSITIONS, "app": pb.Kind_APPS, "role": pb.Kind_ROLES, "log": pb.Kind_AUDITS}
 	for group, kind := range kinds {
-		check := group == "employee" || group == "org" || group == "position" || group == "role" || group == "log"
+		// All catalog-backed business endpoints participate in the active
+		// application's operation policy. Authentication endpoints below remain
+		// explicitly public or session-scoped and are not agent tools.
+		check := true
 		g.add("GET", "/system/"+group+"/query", check, g.query(kind, "query"))
 		if group == "tenant" || group == "employee" || group == "org" {
 			g.add("GET", "/system/"+group+"/info", check, g.query(kind, "info"))
@@ -82,15 +85,16 @@ func (g *Gateway) register() {
 	}
 	g.add("POST", "/system/user/modifyInfo", false, g.save("user"))
 	for group, kind := range map[string]pb.Kind{"tenant": pb.Kind_TENANTS, "employee": pb.Kind_MEMBERS, "position": pb.Kind_POSITIONS} {
-		g.add("GET", "/system/"+group+"/getItems", false, g.query(kind, "items"))
+		g.add("GET", "/system/"+group+"/getItems", true, g.query(kind, "items"))
 	}
-	g.add("GET", "/system/config/districts", false, g.query(pb.Kind_DISTRICTS, "list"))
+	g.add("GET", "/system/config/districts", true, g.query(pb.Kind_DISTRICTS, "list"))
 	for _, path := range []string{"/system/employee/getTenantApps", "/system/employee/queryTenantApps", "/system/app/getAppItems"} {
 		mode := "items"
 		if strings.Contains(path, "queryTenantApps") {
 			mode = "query"
 		}
-		g.add("GET", path, false, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
+		protected := true
+		g.add("GET", path, protected, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
 			q := queryContext(c, p, pb.Kind_APPS)
 			q.AvailableOnly = path != "/system/app/getAppItems"
 			q.TenantAppsOnly = mode == "query"
@@ -113,6 +117,8 @@ func (g *Gateway) register() {
 			return payload{"items": appObjects(r.Apps), "total": r.Total}, nil
 		})
 	}
+	// Availability is a public capability probe used before an application is
+	// selected; it cannot be scoped to the active application's permissions.
 	g.add("GET", "/system/employee/hasApp", false, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
 		appID := p.num("app_id")
 		if appID <= 0 {
@@ -140,11 +146,11 @@ func (g *Gateway) register() {
 		}
 		return len(r.Permissions) > 0, nil
 	})
-	g.add("POST", "/system/tenant/approve", false, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
+	g.add("POST", "/system/tenant/approve", true, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
 		r, e := g.client.ApproveTenant(ctx, &pb.ApproveRequest{Context: c, TenantId: p.num("tenant_id", "id"), Approved: p.boolean("approved") || p.num("verify_status", "status") == 1, AdminPassword: p.str("admin_password")})
 		return r.GetSuccess(), e
 	})
-	g.add("GET", "/system/tenant/verify", false, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
+	g.add("GET", "/system/tenant/verify", true, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
 		return nil, fault.Invalid("请使用POST审核接口并设置初始管理员密码")
 	})
 	g.registerCatalog()
@@ -198,6 +204,11 @@ func (g *Gateway) query(kind pb.Kind, mode string) func(context.Context, *pb.Con
 		case pb.Kind_TENANTS:
 			for _, v := range r.Tenants {
 				x := object(v)
+				// Provider API keys are needed only inside the gateway runtime;
+				// never expose the raw JSON credential to the browser.
+				if raw, ok := x["agent_providers"].(string); ok {
+					x["agent_providers"] = maskTenantProviders(raw)
+				}
 				x["expiration_time"] = v.ExpiresAt
 				x["register_type"] = "create"
 				x["verify_status"] = v.VerifyStatus

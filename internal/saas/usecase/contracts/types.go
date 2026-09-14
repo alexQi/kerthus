@@ -61,20 +61,26 @@ type User struct {
 	Status    *int32 `json:"status,omitempty"`
 }
 type Tenant struct {
-	ID            int64  `json:"id,omitempty"`
-	Name          string `json:"name,omitempty"`
-	Logo          string `json:"logo,omitempty"`
-	ContactPerson string `json:"contact_person,omitempty"`
-	ContactPhone  string `json:"contact_phone,omitempty"`
-	ContactEmail  string `json:"contact_email,omitempty"`
-	CreditCode    string `json:"credit_code,omitempty"`
-	AddressJSON   string `json:"address_json,omitempty"`
-	AddressDetail string `json:"address_detail,omitempty"`
-	Description   string `json:"description,omitempty"`
-	Status        *int32 `json:"status,omitempty"`
-	VerifyStatus  int32  `json:"verify_status,omitempty"`
-	ExpiresAt     int64  `json:"expires_at,omitempty"`
-	CreatedAt     int64  `json:"created_at,omitempty"`
+	ID             int64  `json:"id,omitempty"`
+	Name           string `json:"name,omitempty"`
+	Logo           string `json:"logo,omitempty"`
+	ContactPerson  string `json:"contact_person,omitempty"`
+	ContactPhone   string `json:"contact_phone,omitempty"`
+	ContactEmail   string `json:"contact_email,omitempty"`
+	CreditCode     string `json:"credit_code,omitempty"`
+	AddressJSON    string `json:"address_json,omitempty"`
+	AddressDetail  string `json:"address_detail,omitempty"`
+	Description    string `json:"description,omitempty"`
+	Status         *int32 `json:"status,omitempty"`
+	VerifyStatus   int32  `json:"verify_status,omitempty"`
+	ExpiresAt      int64  `json:"expires_at,omitempty"`
+	CreatedAt      int64  `json:"created_at,omitempty"`
+	AgentProvider  string `json:"agent_provider,omitempty"`
+	AgentModel     string `json:"agent_model,omitempty"`
+	AgentEndpoint  string `json:"agent_endpoint,omitempty"`
+	AgentAPIKey    string `json:"agent_api_key,omitempty"`
+	AgentEnabled   bool   `json:"agent_enabled,omitempty"`
+	AgentProviders string `json:"agent_providers,omitempty"`
 }
 type Member struct {
 	User        *User       `json:"user,omitempty"`
@@ -234,6 +240,9 @@ type QueryRequest struct {
 	AvailableOnly    bool     `json:"available_only,omitempty"`
 	TenantAppsOnly   bool     `json:"tenant_apps_only,omitempty"`
 	ForAuthorization bool     `json:"for_authorization,omitempty"`
+	// IncludeAgentCredentials is reserved for the trusted gateway's internal
+	// Agent runtime; normal tenant queries must receive masked credentials.
+	IncludeAgentCredentials bool `json:"include_agent_credentials,omitempty"`
 }
 type QueryReply struct {
 	Total      int64        `json:"total,omitempty"`

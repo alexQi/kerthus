@@ -86,7 +86,7 @@ func (p *Proxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		base(req)
 		for k := range req.Header {
 			lower := strings.ToLower(k)
-			if strings.HasPrefix(lower, "x-kerthus-") || strings.HasPrefix(lower, "x-forwarded-") || lower == "forwarded" {
+			if strings.HasPrefix(lower, "x-kerthus-") || strings.HasPrefix(lower, "x-forwarded-") || lower == "forwarded" || lower == "access-token" || lower == "tenant-id" || lower == "app-id" || lower == "unit-id" || lower == "section-id" || lower == "x-request-id" {
 				req.Header.Del(k)
 			}
 		}

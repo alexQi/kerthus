@@ -135,6 +135,20 @@ func (s *Service) saveTenant(u ports.Unit, a *actor, v *c.Tenant) (int64, error)
 	t.AddressDetail = v.AddressDetail
 	t.Description = v.Description
 	t.ExpiresAt = v.ExpiresAt
+	t.AgentProvider = strings.TrimSpace(v.AgentProvider)
+	t.AgentModel = strings.TrimSpace(v.AgentModel)
+	t.AgentEndpoint = strings.TrimSpace(v.AgentEndpoint)
+	if v.AgentAPIKey != "" && v.AgentAPIKey != "********" {
+		t.AgentAPIKey = strings.TrimSpace(v.AgentAPIKey)
+	}
+	t.AgentEnabled = v.AgentEnabled
+	if strings.TrimSpace(v.AgentProviders) != "" {
+		providers, err := mergeAgentProviders(t.AgentProviders, v.AgentProviders)
+		if err != nil {
+			return 0, fault.Invalid("Provider 配置格式不正确")
+		}
+		t.AgentProviders = providers
+	}
 	if t.AddressJSON == "" {
 		t.AddressJSON = "[]"
 	}
@@ -142,6 +156,67 @@ func (s *Service) saveTenant(u ports.Unit, a *actor, v *c.Tenant) (int64, error)
 		return 0, e
 	}
 	return t.ID, nil
+}
+
+// mergeAgentProviders preserves credentials when the edit form sends the
+// masked placeholder (or an empty value). Entries are matched by code/provider
+// identity when present, then by their original index for legacy records.
+func mergeAgentProviders(existing, incoming string) (string, error) {
+	var oldList, newList []map[string]any
+	if err := json.Unmarshal([]byte(incoming), &newList); err != nil || newList == nil {
+		return "", errors.New("provider list must be a JSON array")
+	}
+	if strings.TrimSpace(existing) != "" {
+		if err := json.Unmarshal([]byte(existing), &oldList); err != nil {
+			return "", errors.New("stored provider list is invalid")
+		}
+	}
+	for i, item := range newList {
+		if item == nil {
+			return "", errors.New("provider entry must be an object")
+		}
+		old := map[string]any(nil)
+		if identity := providerIdentity(item); identity != "" {
+			for _, candidate := range oldList {
+				if providerIdentity(candidate) == identity {
+					old = candidate
+					break
+				}
+			}
+		}
+		if old == nil && i < len(oldList) {
+			old = oldList[i]
+		}
+		if old == nil {
+			continue
+		}
+		for _, key := range []string{"api_key", "apiKey", "apikey"} {
+			value, exists := item[key]
+			if exists && strings.TrimSpace(fmt.Sprint(value)) != "" && fmt.Sprint(value) != "********" {
+				continue
+			}
+			if previous, ok := old[key].(string); ok && strings.TrimSpace(previous) != "" {
+				item[key] = previous
+				break
+			}
+		}
+	}
+	b, err := json.Marshal(newList)
+	if err != nil {
+		return "", err
+	}
+	return string(b), nil
+}
+
+func providerIdentity(item map[string]any) string {
+	for _, key := range []string{"code", "provider", "id"} {
+		if value, ok := item[key]; ok {
+			if text := strings.TrimSpace(fmt.Sprint(value)); text != "" {
+				return text
+			}
+		}
+	}
+	return ""
 }
 func (s *Service) saveMember(u ports.Unit, a *actor, v *c.Member, password string) (int64, error) {
 	if e := s.require(u, a, "membership.write"); e != nil {

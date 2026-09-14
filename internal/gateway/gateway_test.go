@@ -109,8 +109,8 @@ func TestLegacyLoginAndMenus(t *testing.T) {
 	data := out.obj("data")
 	routes := data["routes"].([]any)
 	menus := data["menus"].([]any)
-	if object(routes[0]).str("name") != "basic_root" || object(menus[0]).str("name") != "基础管理" {
-		t.Fatal("route names leaked into menu titles")
+	if object(routes[0]).str("name") != "basic_root" || object(menus[0]).str("title") != "工作台" {
+		t.Fatalf("application root leaked into first-level menus: routes=%#v menus=%#v", routes, menus)
 	}
 	if len(object(routes[0])["children"].([]any)) != 1 {
 		t.Fatal("action became navigable")

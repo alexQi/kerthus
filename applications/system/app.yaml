@@ -4,7 +4,7 @@
   "name": "平台管理",
   "release_version": "1.0.0",
   "platform_api_version": "v1",
-  "resource_version": 2,
+  "resource_version": 4,
   "http_contract": "api/http/legacy.openapi.yaml",
   "service_key": "kerthus.saas",
   "route_prefix": "/system",
@@ -17,232 +17,440 @@
       "type": "menu",
       "path": "/system",
       "component": "LAYOUT",
-      "sort": 0
+      "sort": 0,
+      "icon": "",
+      "meta": {}
     },
     {
-      "code": "system:home",
+      "code": "system:dashboard",
       "parent_code": "system:root",
-      "name": "工作台",
-      "type": "view",
+      "name": "首页",
+      "type": "menu",
       "path": "/system/dashboard",
       "component": "common/dashboard/index",
-      "sort": 1
+      "sort": 1,
+      "icon": "mdi:desktop-mac-dashboard"
     },
     {
-      "code": "system:tenants",
+      "code": "system:tenant",
       "parent_code": "system:root",
       "name": "租户管理",
-      "type": "view",
-      "path": "/system/tenants",
-      "component": "system/tenant/main/index",
-      "sort": 2
+      "type": "menu",
+      "path": "/system/tenant",
+      "component": "LAYOUT",
+      "sort": 20,
+      "icon": "mdi:baby-face"
     },
     {
-      "code": "system:tenant-detail",
+      "code": "system:application",
       "parent_code": "system:root",
+      "name": "应用管理",
+      "type": "menu",
+      "path": "/system/application",
+      "component": "LAYOUT",
+      "sort": 30,
+      "icon": "mdi:view-dashboard-outline",
+      "redirect": "/system/application/index"
+    },
+    {
+      "code": "system:log",
+      "parent_code": "system:root",
+      "name": "系统日志",
+      "type": "menu",
+      "path": "/system/log",
+      "component": "LAYOUT",
+      "sort": 40,
+      "icon": "mdi:math-log"
+    },
+    {
+      "code": "system:tenant:main",
+      "parent_code": "system:tenant",
+      "name": "租户维护",
+      "type": "menu",
+      "path": "/system/tenant/index",
+      "component": "system/tenant/main/index",
+      "sort": 1,
+      "icon": "mdi:server"
+    },
+    {
+      "code": "system:tenant:user",
+      "parent_code": "system:tenant",
+      "name": "用户维护",
+      "type": "menu",
+      "path": "/system/tenant/user",
+      "component": "system/tenant/user/index",
+      "sort": 1,
+      "icon": "mdi:account-cowboy-hat-outline"
+    },
+    {
+      "code": "system:tenant:detail",
+      "parent_code": "system:tenant",
       "name": "租户详情",
       "type": "view",
       "path": "/system/tenant/detail/:id",
       "component": "system/tenant/detail/index",
-      "sort": 3,
-      "meta": {
-        "hideMenu": true,
-        "hideTab": true,
-        "currentActiveMenu": "/system/tenants"
-      }
+      "sort": 1,
+      "icon": "mdi:eye-settings"
     },
     {
-      "code": "system:applications",
-      "parent_code": "system:root",
-      "name": "应用管理",
-      "type": "view",
-      "path": "/system/applications",
+      "code": "system:application:main",
+      "parent_code": "system:application",
+      "name": "应用维护",
+      "type": "menu",
+      "path": "/system/application/index",
       "component": "system/application/main/index",
-      "sort": 4
+      "sort": 1,
+      "icon": "mdi:apple-keyboard-command"
     },
     {
-      "code": "system:resources",
-      "parent_code": "system:root",
-      "name": "资源管理",
-      "type": "view",
-      "path": "/system/resources",
+      "code": "system:application:resource",
+      "parent_code": "system:application",
+      "name": "资源维护",
+      "type": "menu",
+      "path": "/system/application/resource",
       "component": "system/application/resource/index",
-      "sort": 5
+      "sort": 1,
+      "icon": "mdi:server-security"
     },
     {
-      "code": "system:authorizations",
-      "parent_code": "system:root",
-      "name": "租户应用授权",
-      "type": "view",
-      "path": "/system/authorizations",
+      "code": "system:application:authorize",
+      "parent_code": "system:application",
+      "name": "应用授权",
+      "type": "menu",
+      "path": "/system/application/authorize",
       "component": "system/application/authorize/index",
-      "sort": 6
-    },
-    {
-      "code": "system:accounts",
-      "parent_code": "system:root",
-      "name": "全局账号",
-      "type": "view",
-      "path": "/system/accounts",
-      "component": "system/tenant/user/index",
-      "sort": 7
-    },
-    {
-      "code": "system:application:authorize:auth",
-      "parent_code": "system:root",
-      "name": "system:application:authorize:auth",
-      "type": "action"
-    },
-    {
-      "code": "system:application:authorize:deauth",
-      "parent_code": "system:root",
-      "name": "system:application:authorize:deauth",
-      "type": "action"
-    },
-    {
-      "code": "system:application:resource:save",
-      "parent_code": "system:root",
-      "name": "system:application:resource:save",
-      "type": "action"
-    },
-    {
-      "code": "system:application:main:create",
-      "parent_code": "system:root",
-      "name": "system:application:main:create",
-      "type": "action"
-    },
-    {
-      "code": "system:application:main:delete",
-      "parent_code": "system:root",
-      "name": "system:application:main:delete",
-      "type": "action"
-    },
-    {
-      "code": "system:application:main:edit",
-      "parent_code": "system:root",
-      "name": "system:application:main:edit",
-      "type": "action"
-    },
-    {
-      "code": "system:tenant:main:delete",
-      "parent_code": "system:root",
-      "name": "system:tenant:main:delete",
-      "type": "action"
-    },
-    {
-      "code": "system:tenant:main:edit",
-      "parent_code": "system:root",
-      "name": "system:tenant:main:edit",
-      "type": "action"
-    },
-    {
-      "code": "system:tenant:main:verify",
-      "parent_code": "system:root",
-      "name": "system:tenant:main:verify",
-      "type": "action"
+      "sort": 1,
+      "icon": "mdi:microsoft-access"
     },
     {
       "code": "system:tenant:main:view",
-      "parent_code": "system:root",
-      "name": "system:tenant:main:view",
-      "type": "action"
+      "parent_code": "system:tenant:main",
+      "name": "详情",
+      "type": "action",
+      "path": "/system/tenant/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
-      "code": "system:tenant:detail:role:authRoleResource",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:role:authRoleResource",
-      "type": "action"
+      "code": "system:tenant:main:verify",
+      "parent_code": "system:tenant:main",
+      "name": "审核",
+      "type": "action",
+      "path": "/system/tenant/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
-      "code": "system:tenant:detail:role:delete",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:role:delete",
-      "type": "action"
+      "code": "system:tenant:main:edit",
+      "parent_code": "system:tenant:main",
+      "name": "编辑",
+      "type": "action",
+      "path": "/system/tenant/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
-      "code": "system:tenant:detail:role:save",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:role:save",
-      "type": "action"
+      "code": "system:tenant:main:delete",
+      "parent_code": "system:tenant:main",
+      "name": "删除",
+      "type": "action",
+      "path": "/system/tenant/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
-      "code": "system:tenant:detail:role:relateEmployee",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:role:relateEmployee",
-      "type": "action"
+      "code": "system:tenant:main:query",
+      "parent_code": "system:tenant:main",
+      "name": "查询",
+      "type": "action",
+      "path": "/system/tenant/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
-      "code": "system:tenant:detail:org:delete",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:org:delete",
-      "type": "action"
+      "code": "system:application:main:create",
+      "parent_code": "system:application:main",
+      "name": "新增",
+      "type": "action",
+      "path": "/system/application/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
-      "code": "system:tenant:detail:org:save",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:org:save",
-      "type": "action"
+      "code": "system:application:main:edit",
+      "parent_code": "system:application:main",
+      "name": "编辑",
+      "type": "action",
+      "path": "/system/application/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
-      "code": "system:tenant:detail:position:create",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:position:create",
-      "type": "action"
+      "code": "system:application:main:delete",
+      "parent_code": "system:application:main",
+      "name": "删除",
+      "type": "action",
+      "path": "/system/application/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
-      "code": "system:tenant:detail:position:delete",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:position:delete",
-      "type": "action"
+      "code": "system:application:main:setStatus",
+      "parent_code": "system:application:main",
+      "name": "设置状态",
+      "type": "action",
+      "path": "/system/application/index/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
-      "code": "system:tenant:detail:position:edit",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:position:edit",
-      "type": "action"
+      "code": "system:application:resource:query",
+      "parent_code": "system:application:resource",
+      "name": "查询",
+      "type": "action",
+      "path": "/system/application/resource/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
-      "code": "system:tenant:detail:apps:auth",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:apps:auth",
-      "type": "action"
+      "code": "system:application:resource:save",
+      "parent_code": "system:application:resource",
+      "name": "编辑",
+      "type": "action",
+      "path": "/system/application/resource/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     },
     {
-      "code": "system:tenant:detail:apps:deauth",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:apps:deauth",
-      "type": "action"
-    },
-    {
-      "code": "system:tenant:detail:employee:create",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:employee:create",
-      "type": "action"
-    },
-    {
-      "code": "system:tenant:detail:employee:edit",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:employee:edit",
-      "type": "action"
-    },
-    {
-      "code": "system:tenant:detail:employee:resetPassword",
-      "parent_code": "system:root",
-      "name": "system:tenant:detail:employee:resetPassword",
-      "type": "action"
-    },
-    {
-      "code": "system:application-auth",
-      "parent_code": "system:root",
-      "name": "开通应用",
+      "code": "system:application:authorize:view",
+      "parent_code": "system:application:authorize",
+      "name": "授权应用",
       "type": "view",
       "path": "/system/application/auth",
       "component": "system/application/auth/index",
-      "meta": {
-        "hideMenu": true,
-        "hideTab": true,
-        "currentActiveMenu": "/system/authorizations"
-      }
+      "sort": 1,
+      "icon": "mdi:lightbulb-auto"
+    },
+    {
+      "code": "system:application:authorize:deauth",
+      "parent_code": "system:application:authorize",
+      "name": "取消授权",
+      "type": "action",
+      "path": "/system/application/authorize/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:application:authorize:auth",
+      "parent_code": "system:application:authorize",
+      "name": "授权",
+      "type": "action",
+      "path": "/system/application/authorize/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:application:authorize:query",
+      "parent_code": "system:application:authorize",
+      "name": "查询",
+      "type": "action",
+      "path": "/system/application/authorize/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:log:main",
+      "parent_code": "system:log",
+      "name": "日志记录",
+      "type": "menu",
+      "path": "/system/log/main",
+      "component": "system/log/main/index",
+      "sort": 1,
+      "icon": "mdi:microsoft-onenote"
+    },
+    {
+      "code": "system:tenant:detail:query",
+      "parent_code": "system:tenant:detail",
+      "name": "查询",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:apps:auth",
+      "parent_code": "system:tenant:detail",
+      "name": "应用授权",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:apps:deauth",
+      "parent_code": "system:tenant:detail",
+      "name": "取消授权",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:org:save",
+      "parent_code": "system:tenant:detail",
+      "name": "保存组织架构",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:position:create",
+      "parent_code": "system:tenant:detail",
+      "name": "创建岗位",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:position:edit",
+      "parent_code": "system:tenant:detail",
+      "name": "编辑岗位",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:position:delete",
+      "parent_code": "system:tenant:detail",
+      "name": "删除岗位",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:position:setStatus",
+      "parent_code": "system:tenant:detail",
+      "name": "修改岗位状态",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:role:save",
+      "parent_code": "system:tenant:detail",
+      "name": "保存角色",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:role:delete",
+      "parent_code": "system:tenant:detail",
+      "name": "删除角色",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:role:setStatus",
+      "parent_code": "system:tenant:detail",
+      "name": "修改角色状态",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:role:relateEmployee",
+      "parent_code": "system:tenant:detail",
+      "name": "角色授权用户",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:role:authRoleResource",
+      "parent_code": "system:tenant:detail",
+      "name": "角色资源授权",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:employee:create",
+      "parent_code": "system:tenant:detail",
+      "name": "新增员工",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:employee:edit",
+      "parent_code": "system:tenant:detail",
+      "name": "编辑员工",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:employee:setStatus",
+      "parent_code": "system:tenant:detail",
+      "name": "设置员工状态",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
+    },
+    {
+      "code": "system:tenant:detail:employee:resetPassword",
+      "parent_code": "system:tenant:detail",
+      "name": "重置密码",
+      "type": "action",
+      "path": "/system/tenant/detail/:id/",
+      "component": "LAYOUT",
+      "sort": 1,
+      "icon": "mdi:alpha-c-box"
     }
   ]
 }

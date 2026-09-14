@@ -12,16 +12,17 @@ const MaxPageContextBytes = 16 << 10
 // PageContext is untrusted UI context. Identity fields are always replaced by
 // the authenticated request context before it is given to an agent.
 type PageContext struct {
-	Version     string           `json:"version"`
-	Route       string           `json:"route,omitempty"`
-	Title       string           `json:"title,omitempty"`
-	AppID       int64            `json:"app_id,omitempty"`
-	TenantID    int64            `json:"tenant_id,omitempty"`
-	SelectedIDs []string         `json:"selected_ids,omitempty"`
-	Filters     map[string]any   `json:"filters,omitempty"`
-	VisibleData []map[string]any `json:"visible_data,omitempty"`
-	FormData    map[string]any   `json:"form_data,omitempty"`
-	Locale      string           `json:"locale,omitempty"`
+	Version         string           `json:"version"`
+	Route           string           `json:"route,omitempty"`
+	Title           string           `json:"title,omitempty"`
+	AppID           int64            `json:"app_id,omitempty"`
+	TenantID        int64            `json:"tenant_id,omitempty"`
+	SelectedIDs     []string         `json:"selected_ids,omitempty"`
+	Filters         map[string]any   `json:"filters,omitempty"`
+	VisibleData     []map[string]any `json:"visible_data,omitempty"`
+	FormData        map[string]any   `json:"form_data,omitempty"`
+	Locale          string           `json:"locale,omitempty"`
+	AvailableRoutes []string         `json:"available_routes,omitempty"`
 }
 
 // TrustedContext is supplied by the authenticated gateway, never by the page.
@@ -43,6 +44,7 @@ func NormalizePageContext(in PageContext, trusted TrustedContext) (ContextEnvelo
 	in.Title = limit(strings.TrimSpace(in.Title), 256)
 	in.Locale = limit(strings.TrimSpace(in.Locale), 32)
 	in.AppID, in.TenantID = trusted.AppID, trusted.TenantID
+	in.AvailableRoutes = limitStrings(in.AvailableRoutes, 200, 256)
 	in.SelectedIDs = limitStrings(in.SelectedIDs, 100, 128)
 	in.Filters = sanitizeMap(in.Filters)
 	in.FormData = sanitizeMap(in.FormData)
@@ -73,7 +75,10 @@ func sanitizeMap(in map[string]any) map[string]any {
 	out := make(map[string]any, len(in))
 	for k, v := range in {
 		lk := strings.ToLower(k)
-		if strings.Contains(lk, "password") || strings.Contains(lk, "token") || strings.Contains(lk, "secret") || strings.Contains(lk, "cookie") || strings.Contains(lk, "authorization") {
+		// Page context is sent to an external model. Keep the deny-list broad
+		// enough to cover common credential aliases, including camelCase keys
+		// normalized above, without dropping ordinary IDs.
+		if strings.Contains(lk, "password") || strings.Contains(lk, "token") || strings.Contains(lk, "secret") || strings.Contains(lk, "cookie") || strings.Contains(lk, "authorization") || strings.Contains(lk, "api_key") || strings.Contains(lk, "apikey") || strings.Contains(lk, "access_key") || strings.Contains(lk, "accesskey") || strings.Contains(lk, "private_key") || strings.Contains(lk, "privatekey") || strings.Contains(lk, "credential") {
 			continue
 		}
 		out[k] = sanitizeValue(v)

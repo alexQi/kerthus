@@ -65,7 +65,7 @@ func genericTree(items []any) []any {
 }
 func (g *Gateway) registerCatalog() {
 	for _, path := range []string{"getGlobalResource", "getTenantResources", "getAppResources", "getResource"} {
-		g.add("GET", "/system/app/"+path, false, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
+		g.add("GET", "/system/app/"+path, true, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
 			q := queryContext(c, p, pb.Kind_RESOURCES)
 			if path == "getResource" && q.Id <= 0 {
 				return nil, fault.Invalid("必须指定资源ID")
@@ -112,7 +112,7 @@ func (g *Gateway) registerCatalog() {
 			return out, nil
 		})
 	}
-	g.add("GET", "/system/app/queryResourceApis", false, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
+	g.add("GET", "/system/app/queryResourceApis", true, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
 		q := queryContext(c, p, pb.Kind_OPERATIONS)
 		q.ParentId = p.num("resource_id")
 		r, e := g.queryAll(ctx, q)
@@ -171,11 +171,11 @@ func (g *Gateway) registerCatalog() {
 		}
 		return payload{"classes": classes, "actions": groups}, nil
 	})
-	g.add("GET", "/system/app/removeResource", false, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
+	g.add("GET", "/system/app/removeResource", true, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
 		r, e := g.client.Delete(ctx, &pb.DeleteRequest{Context: c, Kind: pb.Kind_RESOURCES, Id: p.num("resource_id", "id")})
 		return r.GetSuccess(), e
 	})
-	g.add("POST", "/system/app/saveResource", false, func(ctx context.Context, c *pb.Context, in payload) (any, error) {
+	g.add("POST", "/system/app/saveResource", true, func(ctx context.Context, c *pb.Context, in payload) (any, error) {
 		p := normalize(in)
 		if v, ok := p["meta"]; ok {
 			if s, ok := v.(string); ok {
@@ -201,14 +201,14 @@ func (g *Gateway) registerCatalog() {
 		}
 		return r.Id, nil
 	})
-	g.add("GET", "/system/app/queryTeantAuthorizes", false, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
+	g.add("GET", "/system/app/queryTeantAuthorizes", true, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
 		r, e := g.client.Query(ctx, queryContext(c, p, pb.Kind_TENANT_APPS))
 		if e != nil {
 			return nil, e
 		}
 		return payload{"items": empty(r.TenantApps), "total": r.Total}, nil
 	})
-	g.add("GET", "/system/app/getTenantResourceIds", false, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
+	g.add("GET", "/system/app/getTenantResourceIds", true, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
 		q := queryContext(c, p, pb.Kind_TENANT_APPS)
 		q.Page = 0
 		q.PageSize = 1000
@@ -230,7 +230,7 @@ func operationObject(o *pb.Operation) payload {
 	return payload{"id": o.Id, "app_id": o.AppId, "resource_id": o.ResourceId, "operation_id": o.OperationId, "controller": o.Group, "group": o.Group, "method": o.Method, "uri": o.Path, "path": o.Path, "action": o.OperationId}
 }
 func (g *Gateway) registerGrants() {
-	g.add("POST", "/system/app/authorizeApp", false, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
+	g.add("POST", "/system/app/authorizeApp", true, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
 		req := &pb.EntitlementsRequest{Context: c, TenantIds: p.arr("tenant_ids")}
 		for key, raw := range p.obj("resource_map") {
 			aid, e := strconv.ParseInt(key, 10, 64)
@@ -247,7 +247,7 @@ func (g *Gateway) registerGrants() {
 		r, e := g.client.SetEntitlements(ctx, req)
 		return r.GetSuccess(), e
 	})
-	g.add("POST", "/system/app/deauthorizeApp", false, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
+	g.add("POST", "/system/app/deauthorizeApp", true, func(ctx context.Context, c *pb.Context, p payload) (any, error) {
 		r, e := g.client.SetEntitlements(ctx, &pb.EntitlementsRequest{Context: c, RevokeIds: p.arr("tenant_app_ids")})
 		return r.GetSuccess(), e
 	})
@@ -315,7 +315,22 @@ func menuTree(resources []*pb.Resource) []any {
 		}
 		nodes = append(nodes, x)
 	}
-	return genericTree(nodes)
+	tree := genericTree(nodes)
+	// The application root is a routing container (for example
+	// `basic:root`), not a navigable menu item. Keep it in `routes` so the
+	// layout hierarchy remains intact, but expose its children directly in
+	// `menus` so the application itself is not rendered as a first-level menu.
+	menus := []any{}
+	for _, item := range tree {
+		x := object(item)
+		if strings.HasSuffix(x.str("code"), ":root") {
+			children, _ := x["children"].([]any)
+			menus = append(menus, children...)
+			continue
+		}
+		menus = append(menus, item)
+	}
+	return menus
 }
 
 // Publication is catalog metadata; tenant entitlements still determine availability.

@@ -10,6 +10,7 @@ import (
 	microerrors "go-micro.dev/v6/errors"
 	"io"
 	pb "kerthus/gen/go/saas/v1"
+	agentcore "kerthus/internal/agent"
 	"kerthus/internal/platform/rpcauth"
 	"kerthus/internal/saas/domain/fault"
 	"net/http"
@@ -19,14 +20,17 @@ import (
 )
 
 type Config struct {
+	AgentHTTPClient                   *http.Client
 	GatewayKey, StaticURL             string
 	CORSOrigins                       []string
+	AgentStore                        *agentcore.SessionStore
 	Upload, Download, Files, AppProxy http.Handler
 }
 type Gateway struct {
-	client pb.PlatformService
-	config Config
-	routes map[string]route
+	client     pb.PlatformService
+	config     Config
+	routes     map[string]route
+	agentStore *agentcore.SessionStore
 }
 type route struct {
 	method string
@@ -36,7 +40,11 @@ type route struct {
 type payload map[string]any
 
 func New(client pb.PlatformService, c Config) http.Handler {
-	g := &Gateway{client: client, config: c, routes: map[string]route{}}
+	store := c.AgentStore
+	if store == nil {
+		store = agentcore.NewSessionStore()
+	}
+	g := &Gateway{client: client, config: c, routes: map[string]route{}, agentStore: store}
 	g.register()
 	return g
 }
@@ -82,6 +90,9 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		g.config.AppProxy.ServeHTTP(w, r)
 		return
 	}
+	if g.handleAgent(w, r) {
+		return
+	}
 	rt, ok := g.routes[r.URL.Path]
 	if !ok {
 		writeError(w, fault.NotFound)
@@ -112,7 +123,11 @@ func (g *Gateway) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		// Tenant role codes are labels, never proof of platform privilege.
 		if !auth.GetPlatformAdmin() {
-			_, e = g.client.CheckAccess(ctx, &pb.AccessRequest{Context: actor, AppCode: "basic", Method: r.Method, Path: r.URL.Path})
+			appCode := "basic"
+			if auth.GetContext() != nil && auth.GetContext().GetAppCode() != "" {
+				appCode = auth.GetContext().GetAppCode()
+			}
+			_, e = g.client.CheckAccess(ctx, &pb.AccessRequest{Context: actor, AppCode: appCode, Method: r.Method, Path: r.URL.Path})
 			if e != nil {
 				writeError(w, e)
 				return

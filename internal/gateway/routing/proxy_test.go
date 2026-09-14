@@ -32,6 +32,11 @@ func TestRegisteredAppProxyChecksBeforeForwarding(t *testing.T) {
 		if r.Header.Get("X-Kerthus-Actor") != "" || r.Header.Get("X-Kerthus-Service-Key") != "" {
 			t.Error("forged service metadata forwarded")
 		}
+		for _, name := range []string{"access-token", "unit-id", "section-id", "x-request-id"} {
+			if r.Header.Get(name) != "" {
+				t.Errorf("platform credential header %s forwarded", name)
+			}
+		}
 		if r.Header.Get("tenant-id") != "9" || r.Header.Get("app-id") != "7" {
 			t.Error("context not canonicalized")
 		}
@@ -51,6 +56,10 @@ func TestRegisteredAppProxyChecksBeforeForwarding(t *testing.T) {
 		r.Header.Set("X-Kerthus-Service-Key", "forged")
 		r.Header.Set("tenant-id", "9")
 		r.Header.Set("app-id", "7")
+		r.Header.Set("access-token", "user-token")
+		r.Header.Set("unit-id", "8")
+		r.Header.Set("section-id", "6")
+		r.Header.Set("X-Request-Id", "request-id")
 		w := httptest.NewRecorder()
 		proxy.ServeHTTP(w, r)
 		return w

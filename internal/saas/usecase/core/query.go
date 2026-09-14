@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"encoding/json"
 	"kerthus/internal/saas/domain/access"
 	"kerthus/internal/saas/domain/audit"
 	"kerthus/internal/saas/domain/catalog"
@@ -15,6 +16,29 @@ import (
 	"strings"
 )
 
+func maskAgentProviders(raw string) string {
+	if strings.TrimSpace(raw) == "" {
+		return raw
+	}
+	var items []map[string]any
+	if err := json.Unmarshal([]byte(raw), &items); err != nil {
+		return raw
+	}
+	for _, item := range items {
+		for key := range item {
+			lower := strings.ToLower(strings.ReplaceAll(strings.ReplaceAll(key, "-", "_"), " ", "_"))
+			if lower == "api_key" || lower == "apikey" || lower == "access_key" || lower == "accesskey" {
+				item[key] = "********"
+			}
+		}
+	}
+	b, err := json.Marshal(items)
+	if err != nil {
+		return raw
+	}
+	return string(b)
+}
+
 func resourceDTO(v catalog.Resource) *c.Resource {
 	return &c.Resource{ID: v.ID, AppID: v.AppID, ParentID: v.ParentID, Code: v.Code, Name: v.Name, Type: v.Type, Path: v.Path, Component: v.Component, Redirect: v.Redirect, OpenWith: v.OpenWith, Remark: v.Remark, Icon: v.Icon, MetaJSON: v.MetaJSON, Status: ptr(v.Status), Sort: v.Sort, IsPublic: v.IsPublic, IsDataAccess: v.IsDataAccess}
 }
@@ -27,8 +51,17 @@ func orgDTO(v organization.Org) *c.Org {
 func positionDTO(v organization.Position) *c.Position {
 	return &c.Position{ID: v.ID, TenantID: v.TenantID, OrgID: v.OrgID, Name: v.Name, Status: ptr(v.Status), Remark: v.Remark, CreatedAt: v.CreatedAt, UpdatedAt: v.UpdatedAt}
 }
-func tenantDTO(v tenant.Tenant) *c.Tenant {
-	return &c.Tenant{ID: v.ID, Name: v.Name, Logo: v.Logo, ContactPerson: v.ContactPerson, ContactPhone: v.ContactPhone, ContactEmail: v.ContactEmail, CreditCode: v.CreditCode, AddressJSON: v.AddressJSON, AddressDetail: v.AddressDetail, Description: v.Description, Status: ptr(v.Status), VerifyStatus: v.VerifyStatus, ExpiresAt: v.ExpiresAt, CreatedAt: v.CreatedAt}
+func tenantDTO(v tenant.Tenant, includeAgentCredentials bool) *c.Tenant {
+	key, providers := "", ""
+	if includeAgentCredentials {
+		key, providers = v.AgentAPIKey, v.AgentProviders
+	} else {
+		if v.AgentAPIKey != "" {
+			key = "********"
+		}
+		providers = maskAgentProviders(v.AgentProviders)
+	}
+	return &c.Tenant{ID: v.ID, Name: v.Name, Logo: v.Logo, ContactPerson: v.ContactPerson, ContactPhone: v.ContactPhone, ContactEmail: v.ContactEmail, CreditCode: v.CreditCode, AddressJSON: v.AddressJSON, AddressDetail: v.AddressDetail, Description: v.Description, Status: ptr(v.Status), VerifyStatus: v.VerifyStatus, ExpiresAt: v.ExpiresAt, CreatedAt: v.CreatedAt, AgentProvider: v.AgentProvider, AgentModel: v.AgentModel, AgentEndpoint: v.AgentEndpoint, AgentAPIKey: key, AgentEnabled: v.AgentEnabled, AgentProviders: providers}
 }
 func opDTO(v catalog.Operation) *c.Operation {
 	return &c.Operation{ID: v.ID, AppID: v.AppID, ResourceID: v.ResourceID, OperationID: v.OperationID, Method: v.Method, Path: v.Path, Group: v.GroupName, Action: v.Action}
@@ -149,7 +182,7 @@ func (s *Service) Query(ctx context.Context, req *c.QueryRequest) (*c.QueryReply
 				return e
 			}
 			for _, v := range items {
-				out.Tenants = append(out.Tenants, tenantDTO(v))
+				out.Tenants = append(out.Tenants, tenantDTO(v, req.IncludeAgentCredentials))
 			}
 			return count(ports.Tenants)
 		case c.KindMembers:

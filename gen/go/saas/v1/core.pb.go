@@ -541,23 +541,29 @@ func (x *User) GetUpdatedAt() int64 {
 }
 
 type Tenant struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Logo          string                 `protobuf:"bytes,3,opt,name=logo,proto3" json:"logo,omitempty"`
-	ContactPerson string                 `protobuf:"bytes,4,opt,name=contact_person,json=contactPerson,proto3" json:"contact_person,omitempty"`
-	ContactPhone  string                 `protobuf:"bytes,5,opt,name=contact_phone,json=contactPhone,proto3" json:"contact_phone,omitempty"`
-	ContactEmail  string                 `protobuf:"bytes,6,opt,name=contact_email,json=contactEmail,proto3" json:"contact_email,omitempty"`
-	CreditCode    string                 `protobuf:"bytes,7,opt,name=credit_code,json=creditCode,proto3" json:"credit_code,omitempty"`
-	AddressJson   string                 `protobuf:"bytes,8,opt,name=address_json,json=addressJson,proto3" json:"address_json,omitempty"`
-	AddressDetail string                 `protobuf:"bytes,9,opt,name=address_detail,json=addressDetail,proto3" json:"address_detail,omitempty"`
-	Description   string                 `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
-	Status        *int32                 `protobuf:"varint,11,opt,name=status,proto3,oneof" json:"status,omitempty"`
-	VerifyStatus  int32                  `protobuf:"varint,12,opt,name=verify_status,json=verifyStatus,proto3" json:"verify_status,omitempty"`
-	ExpiresAt     int64                  `protobuf:"varint,13,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	CreatedAt     int64                  `protobuf:"varint,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name           string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Logo           string                 `protobuf:"bytes,3,opt,name=logo,proto3" json:"logo,omitempty"`
+	ContactPerson  string                 `protobuf:"bytes,4,opt,name=contact_person,json=contactPerson,proto3" json:"contact_person,omitempty"`
+	ContactPhone   string                 `protobuf:"bytes,5,opt,name=contact_phone,json=contactPhone,proto3" json:"contact_phone,omitempty"`
+	ContactEmail   string                 `protobuf:"bytes,6,opt,name=contact_email,json=contactEmail,proto3" json:"contact_email,omitempty"`
+	CreditCode     string                 `protobuf:"bytes,7,opt,name=credit_code,json=creditCode,proto3" json:"credit_code,omitempty"`
+	AddressJson    string                 `protobuf:"bytes,8,opt,name=address_json,json=addressJson,proto3" json:"address_json,omitempty"`
+	AddressDetail  string                 `protobuf:"bytes,9,opt,name=address_detail,json=addressDetail,proto3" json:"address_detail,omitempty"`
+	Description    string                 `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
+	Status         *int32                 `protobuf:"varint,11,opt,name=status,proto3,oneof" json:"status,omitempty"`
+	VerifyStatus   int32                  `protobuf:"varint,12,opt,name=verify_status,json=verifyStatus,proto3" json:"verify_status,omitempty"`
+	ExpiresAt      int64                  `protobuf:"varint,13,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	CreatedAt      int64                  `protobuf:"varint,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	AgentProvider  string                 `protobuf:"bytes,15,opt,name=agent_provider,json=agentProvider,proto3" json:"agent_provider,omitempty"`
+	AgentModel     string                 `protobuf:"bytes,16,opt,name=agent_model,json=agentModel,proto3" json:"agent_model,omitempty"`
+	AgentEndpoint  string                 `protobuf:"bytes,17,opt,name=agent_endpoint,json=agentEndpoint,proto3" json:"agent_endpoint,omitempty"`
+	AgentApiKey    string                 `protobuf:"bytes,18,opt,name=agent_api_key,json=agentApiKey,proto3" json:"agent_api_key,omitempty"`
+	AgentEnabled   bool                   `protobuf:"varint,19,opt,name=agent_enabled,json=agentEnabled,proto3" json:"agent_enabled,omitempty"`
+	AgentProviders string                 `protobuf:"bytes,20,opt,name=agent_providers,json=agentProviders,proto3" json:"agent_providers,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *Tenant) Reset() {
@@ -686,6 +692,48 @@ func (x *Tenant) GetCreatedAt() int64 {
 		return x.CreatedAt
 	}
 	return 0
+}
+
+func (x *Tenant) GetAgentProvider() string {
+	if x != nil {
+		return x.AgentProvider
+	}
+	return ""
+}
+
+func (x *Tenant) GetAgentModel() string {
+	if x != nil {
+		return x.AgentModel
+	}
+	return ""
+}
+
+func (x *Tenant) GetAgentEndpoint() string {
+	if x != nil {
+		return x.AgentEndpoint
+	}
+	return ""
+}
+
+func (x *Tenant) GetAgentApiKey() string {
+	if x != nil {
+		return x.AgentApiKey
+	}
+	return ""
+}
+
+func (x *Tenant) GetAgentEnabled() bool {
+	if x != nil {
+		return x.AgentEnabled
+	}
+	return false
+}
+
+func (x *Tenant) GetAgentProviders() string {
+	if x != nil {
+		return x.AgentProviders
+	}
+	return ""
 }
 
 type Member struct {
@@ -1985,33 +2033,34 @@ func (x *AuthReply) GetPlatformAdmin() bool {
 }
 
 type QueryRequest struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Context          *Context               `protobuf:"bytes,1,opt,name=context,proto3" json:"context,omitempty"`
-	Kind             Kind                   `protobuf:"varint,2,opt,name=kind,proto3,enum=kerthus.saas.v1.Kind" json:"kind,omitempty"`
-	Id               int64                  `protobuf:"varint,3,opt,name=id,proto3" json:"id,omitempty"`
-	TargetTenantId   int64                  `protobuf:"varint,4,opt,name=target_tenant_id,json=targetTenantId,proto3" json:"target_tenant_id,omitempty"`
-	TargetAppId      int64                  `protobuf:"varint,5,opt,name=target_app_id,json=targetAppId,proto3" json:"target_app_id,omitempty"`
-	ParentId         int64                  `protobuf:"varint,6,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"`
-	RoleId           int64                  `protobuf:"varint,7,opt,name=role_id,json=roleId,proto3" json:"role_id,omitempty"`
-	Page             int32                  `protobuf:"varint,8,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize         int32                  `protobuf:"varint,9,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
-	Search           string                 `protobuf:"bytes,10,opt,name=search,proto3" json:"search,omitempty"`
-	Sort             string                 `protobuf:"bytes,11,opt,name=sort,proto3" json:"sort,omitempty"`
-	Desc             bool                   `protobuf:"varint,12,opt,name=desc,proto3" json:"desc,omitempty"`
-	AvailableOnly    bool                   `protobuf:"varint,13,opt,name=available_only,json=availableOnly,proto3" json:"available_only,omitempty"`
-	ForAuthorization bool                   `protobuf:"varint,14,opt,name=for_authorization,json=forAuthorization,proto3" json:"for_authorization,omitempty"`
-	Name             string                 `protobuf:"bytes,15,opt,name=name,proto3" json:"name,omitempty"`
-	Phone            string                 `protobuf:"bytes,16,opt,name=phone,proto3" json:"phone,omitempty"`
-	OrgId            int64                  `protobuf:"varint,17,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
-	IncludeChildren  bool                   `protobuf:"varint,18,opt,name=include_children,json=includeChildren,proto3" json:"include_children,omitempty"`
-	CreatedFrom      int64                  `protobuf:"varint,19,opt,name=created_from,json=createdFrom,proto3" json:"created_from,omitempty"`
-	CreatedBefore    int64                  `protobuf:"varint,20,opt,name=created_before,json=createdBefore,proto3" json:"created_before,omitempty"`
-	Code             string                 `protobuf:"bytes,21,opt,name=code,proto3" json:"code,omitempty"`
-	TenantName       string                 `protobuf:"bytes,22,opt,name=tenant_name,json=tenantName,proto3" json:"tenant_name,omitempty"`
-	AppName          string                 `protobuf:"bytes,23,opt,name=app_name,json=appName,proto3" json:"app_name,omitempty"`
-	TenantAppsOnly   bool                   `protobuf:"varint,24,opt,name=tenant_apps_only,json=tenantAppsOnly,proto3" json:"tenant_apps_only,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state                   protoimpl.MessageState `protogen:"open.v1"`
+	Context                 *Context               `protobuf:"bytes,1,opt,name=context,proto3" json:"context,omitempty"`
+	Kind                    Kind                   `protobuf:"varint,2,opt,name=kind,proto3,enum=kerthus.saas.v1.Kind" json:"kind,omitempty"`
+	Id                      int64                  `protobuf:"varint,3,opt,name=id,proto3" json:"id,omitempty"`
+	TargetTenantId          int64                  `protobuf:"varint,4,opt,name=target_tenant_id,json=targetTenantId,proto3" json:"target_tenant_id,omitempty"`
+	TargetAppId             int64                  `protobuf:"varint,5,opt,name=target_app_id,json=targetAppId,proto3" json:"target_app_id,omitempty"`
+	ParentId                int64                  `protobuf:"varint,6,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"`
+	RoleId                  int64                  `protobuf:"varint,7,opt,name=role_id,json=roleId,proto3" json:"role_id,omitempty"`
+	Page                    int32                  `protobuf:"varint,8,opt,name=page,proto3" json:"page,omitempty"`
+	PageSize                int32                  `protobuf:"varint,9,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	Search                  string                 `protobuf:"bytes,10,opt,name=search,proto3" json:"search,omitempty"`
+	Sort                    string                 `protobuf:"bytes,11,opt,name=sort,proto3" json:"sort,omitempty"`
+	Desc                    bool                   `protobuf:"varint,12,opt,name=desc,proto3" json:"desc,omitempty"`
+	AvailableOnly           bool                   `protobuf:"varint,13,opt,name=available_only,json=availableOnly,proto3" json:"available_only,omitempty"`
+	ForAuthorization        bool                   `protobuf:"varint,14,opt,name=for_authorization,json=forAuthorization,proto3" json:"for_authorization,omitempty"`
+	Name                    string                 `protobuf:"bytes,15,opt,name=name,proto3" json:"name,omitempty"`
+	Phone                   string                 `protobuf:"bytes,16,opt,name=phone,proto3" json:"phone,omitempty"`
+	OrgId                   int64                  `protobuf:"varint,17,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
+	IncludeChildren         bool                   `protobuf:"varint,18,opt,name=include_children,json=includeChildren,proto3" json:"include_children,omitempty"`
+	CreatedFrom             int64                  `protobuf:"varint,19,opt,name=created_from,json=createdFrom,proto3" json:"created_from,omitempty"`
+	CreatedBefore           int64                  `protobuf:"varint,20,opt,name=created_before,json=createdBefore,proto3" json:"created_before,omitempty"`
+	Code                    string                 `protobuf:"bytes,21,opt,name=code,proto3" json:"code,omitempty"`
+	TenantName              string                 `protobuf:"bytes,22,opt,name=tenant_name,json=tenantName,proto3" json:"tenant_name,omitempty"`
+	AppName                 string                 `protobuf:"bytes,23,opt,name=app_name,json=appName,proto3" json:"app_name,omitempty"`
+	TenantAppsOnly          bool                   `protobuf:"varint,24,opt,name=tenant_apps_only,json=tenantAppsOnly,proto3" json:"tenant_apps_only,omitempty"`
+	IncludeAgentCredentials bool                   `protobuf:"varint,25,opt,name=include_agent_credentials,json=includeAgentCredentials,proto3" json:"include_agent_credentials,omitempty"`
+	unknownFields           protoimpl.UnknownFields
+	sizeCache               protoimpl.SizeCache
 }
 
 func (x *QueryRequest) Reset() {
@@ -2208,6 +2257,13 @@ func (x *QueryRequest) GetAppName() string {
 func (x *QueryRequest) GetTenantAppsOnly() bool {
 	if x != nil {
 		return x.TenantAppsOnly
+	}
+	return false
+}
+
+func (x *QueryRequest) GetIncludeAgentCredentials() bool {
+	if x != nil {
+		return x.IncludeAgentCredentials
 	}
 	return false
 }
@@ -3627,7 +3683,7 @@ const file_saas_v1_core_proto_rawDesc = "" +
 	"created_at\x18\b \x01(\x03R\tcreatedAt\x12\x1d\n" +
 	"\n" +
 	"updated_at\x18\t \x01(\x03R\tupdatedAtB\t\n" +
-	"\a_status\"\xc9\x03\n" +
+	"\a_status\"\xaa\x05\n" +
 	"\x06Tenant\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\x03R\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x12\n" +
@@ -3646,7 +3702,14 @@ const file_saas_v1_core_proto_rawDesc = "" +
 	"\n" +
 	"expires_at\x18\r \x01(\x03R\texpiresAt\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\x0e \x01(\x03R\tcreatedAtB\t\n" +
+	"created_at\x18\x0e \x01(\x03R\tcreatedAt\x12%\n" +
+	"\x0eagent_provider\x18\x0f \x01(\tR\ragentProvider\x12\x1f\n" +
+	"\vagent_model\x18\x10 \x01(\tR\n" +
+	"agentModel\x12%\n" +
+	"\x0eagent_endpoint\x18\x11 \x01(\tR\ragentEndpoint\x12\"\n" +
+	"\ragent_api_key\x18\x12 \x01(\tR\vagentApiKey\x12#\n" +
+	"\ragent_enabled\x18\x13 \x01(\bR\fagentEnabled\x12'\n" +
+	"\x0fagent_providers\x18\x14 \x01(\tR\x0eagentProvidersB\t\n" +
 	"\a_status\"\xc7\x02\n" +
 	"\x06Member\x12)\n" +
 	"\x04user\x18\x01 \x01(\v2\x15.kerthus.saas.v1.UserR\x04user\x12\x1b\n" +
@@ -3791,7 +3854,7 @@ const file_saas_v1_core_proto_rawDesc = "" +
 	"\vpermissions\x18\x02 \x03(\tR\vpermissions\x127\n" +
 	"\tresources\x18\x03 \x03(\v2\x19.kerthus.saas.v1.ResourceR\tresources\x125\n" +
 	"\acontext\x18\x04 \x01(\v2\x1b.kerthus.saas.v1.LoginReplyR\acontext\x12%\n" +
-	"\x0eplatform_admin\x18\x05 \x01(\bR\rplatformAdmin\"\xf6\x05\n" +
+	"\x0eplatform_admin\x18\x05 \x01(\bR\rplatformAdmin\"\xb2\x06\n" +
 	"\fQueryRequest\x122\n" +
 	"\acontext\x18\x01 \x01(\v2\x18.kerthus.saas.v1.ContextR\acontext\x12)\n" +
 	"\x04kind\x18\x02 \x01(\x0e2\x15.kerthus.saas.v1.KindR\x04kind\x12\x0e\n" +
@@ -3818,7 +3881,8 @@ const file_saas_v1_core_proto_rawDesc = "" +
 	"\vtenant_name\x18\x16 \x01(\tR\n" +
 	"tenantName\x12\x19\n" +
 	"\bapp_name\x18\x17 \x01(\tR\aappName\x12(\n" +
-	"\x10tenant_apps_only\x18\x18 \x01(\bR\x0etenantAppsOnly\"\x8a\x05\n" +
+	"\x10tenant_apps_only\x18\x18 \x01(\bR\x0etenantAppsOnly\x12:\n" +
+	"\x19include_agent_credentials\x18\x19 \x01(\bR\x17includeAgentCredentials\"\x8a\x05\n" +
 	"\n" +
 	"QueryReply\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x03R\x05total\x12+\n" +

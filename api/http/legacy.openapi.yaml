@@ -14,7 +14,7 @@
       "post": {
         "operationId": "post_system_user_login",
         "x-app-code": "system",
-        "x-resource-code": "system:accounts",
+        "x-resource-code": "system:tenant:user",
         "x-action": "user.login",
         "x-group": "user",
         "responses": {
@@ -46,7 +46,7 @@
       "get": {
         "operationId": "get_system_user_logout",
         "x-app-code": "system",
-        "x-resource-code": "system:accounts",
+        "x-resource-code": "system:tenant:user",
         "x-action": "user.logout",
         "x-group": "user",
         "responses": {
@@ -72,7 +72,7 @@
       "get": {
         "operationId": "get_system_user_profile",
         "x-app-code": "system",
-        "x-resource-code": "system:accounts",
+        "x-resource-code": "system:tenant:user",
         "x-action": "user.profile",
         "x-group": "user",
         "responses": {
@@ -98,7 +98,7 @@
       "get": {
         "operationId": "get_system_user_auth",
         "x-app-code": "system",
-        "x-resource-code": "system:accounts",
+        "x-resource-code": "system:tenant:user",
         "x-action": "user.auth",
         "x-group": "user",
         "responses": {
@@ -124,7 +124,7 @@
       "post": {
         "operationId": "post_system_user_modifyInfo",
         "x-app-code": "system",
-        "x-resource-code": "system:accounts",
+        "x-resource-code": "system:tenant:user",
         "x-action": "user.modifyInfo",
         "x-group": "user",
         "responses": {
@@ -160,7 +160,7 @@
       "post": {
         "operationId": "post_system_user_modifyPassword",
         "x-app-code": "system",
-        "x-resource-code": "system:accounts",
+        "x-resource-code": "system:tenant:user",
         "x-action": "user.modifyPassword",
         "x-group": "user",
         "responses": {
@@ -196,7 +196,7 @@
       "post": {
         "operationId": "post_system_user_resetPassword",
         "x-app-code": "system",
-        "x-resource-code": "system:accounts",
+        "x-resource-code": "system:tenant:user",
         "x-action": "user.resetPassword",
         "x-group": "user",
         "responses": {
@@ -232,7 +232,7 @@
       "get": {
         "operationId": "get_system_user_setStatus",
         "x-app-code": "system",
-        "x-resource-code": "system:accounts",
+        "x-resource-code": "system:tenant:user",
         "x-action": "user.setStatus",
         "x-group": "user",
         "responses": {
@@ -258,7 +258,7 @@
       "get": {
         "operationId": "get_system_user_query",
         "x-app-code": "system",
-        "x-resource-code": "system:accounts",
+        "x-resource-code": "system:tenant:user",
         "x-action": "user.query",
         "x-group": "user",
         "responses": {
@@ -284,7 +284,7 @@
       "get": {
         "operationId": "get_system_tenant_query",
         "x-app-code": "system",
-        "x-resource-code": "system:tenants",
+        "x-resource-code": "system:tenant:main",
         "x-action": "tenant.query",
         "x-group": "tenant",
         "parameters": [
@@ -330,7 +330,7 @@
       "get": {
         "operationId": "get_system_tenant_info",
         "x-app-code": "system",
-        "x-resource-code": "system:tenants",
+        "x-resource-code": "system:tenant:detail",
         "x-action": "tenant.info",
         "x-group": "tenant",
         "responses": {
@@ -356,7 +356,7 @@
       "get": {
         "operationId": "get_system_tenant_delete",
         "x-app-code": "system",
-        "x-resource-code": "system:tenants",
+        "x-resource-code": "system:tenant:main",
         "x-action": "tenant.delete",
         "x-group": "tenant",
         "responses": {
@@ -382,7 +382,7 @@
       "get": {
         "operationId": "get_system_tenant_setStatus",
         "x-app-code": "system",
-        "x-resource-code": "system:tenants",
+        "x-resource-code": "system:tenant:main",
         "x-action": "tenant.setStatus",
         "x-group": "tenant",
         "responses": {
@@ -408,7 +408,7 @@
       "get": {
         "operationId": "get_system_tenant_verify",
         "x-app-code": "system",
-        "x-resource-code": "system:tenants",
+        "x-resource-code": "system:tenant:main",
         "x-action": "tenant.verify",
         "x-group": "tenant",
         "responses": {
@@ -434,7 +434,7 @@
       "post": {
         "operationId": "post_system_tenant_save",
         "x-app-code": "system",
-        "x-resource-code": "system:tenants",
+        "x-resource-code": "system:tenant:main",
         "x-action": "tenant.save",
         "x-group": "tenant",
         "responses": {
@@ -470,7 +470,7 @@
       "post": {
         "operationId": "post_system_tenant_approve",
         "x-app-code": "system",
-        "x-resource-code": "system:tenants",
+        "x-resource-code": "system:tenant:main",
         "x-action": "tenant.approve",
         "x-group": "tenant",
         "responses": {
@@ -506,7 +506,7 @@
       "get": {
         "operationId": "get_system_app_query",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:main",
         "x-action": "app.query",
         "x-group": "app",
         "responses": {
@@ -550,7 +550,7 @@
       "get": {
         "operationId": "get_system_app_delete",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:main",
         "x-action": "app.delete",
         "x-group": "app",
         "responses": {
@@ -576,7 +576,7 @@
       "get": {
         "operationId": "get_system_app_setStatus",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:main",
         "x-action": "app.setStatus",
         "x-group": "app",
         "responses": {
@@ -602,7 +602,7 @@
       "get": {
         "operationId": "get_system_app_getAppItems",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:main",
         "x-action": "app.getAppItems",
         "x-group": "app",
         "responses": {
@@ -628,7 +628,7 @@
       "post": {
         "operationId": "post_system_app_save",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:main",
         "x-action": "app.save",
         "x-group": "app",
         "responses": {
@@ -675,7 +675,7 @@
       "get": {
         "operationId": "get_system_app_getGlobalResource",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:authorize",
         "x-action": "app.getGlobalResource",
         "x-group": "app",
         "responses": {
@@ -701,7 +701,7 @@
       "get": {
         "operationId": "get_system_app_getResource",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:resource",
         "x-action": "app.getResource",
         "x-group": "app",
         "responses": {
@@ -727,7 +727,7 @@
       "get": {
         "operationId": "get_system_app_getAppResources",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:resource",
         "x-action": "app.getAppResources",
         "x-group": "app",
         "responses": {
@@ -753,7 +753,7 @@
       "get": {
         "operationId": "get_system_app_queryResourceApis",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:resource",
         "x-action": "app.queryResourceApis",
         "x-group": "app",
         "responses": {
@@ -779,7 +779,7 @@
       "get": {
         "operationId": "get_system_app_removeResource",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:resource",
         "x-action": "app.removeResource",
         "x-group": "app",
         "responses": {
@@ -805,7 +805,7 @@
       "post": {
         "operationId": "post_system_app_saveResource",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:resource",
         "x-action": "app.saveResource",
         "x-group": "app",
         "responses": {
@@ -857,7 +857,7 @@
       "get": {
         "operationId": "get_system_app_queryTeantAuthorizes",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:authorize",
         "x-action": "app.queryTeantAuthorizes",
         "x-group": "app",
         "responses": {
@@ -901,7 +901,7 @@
       "get": {
         "operationId": "get_system_app_getTenantResourceIds",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:authorize",
         "x-action": "app.getTenantResourceIds",
         "x-group": "app",
         "responses": {
@@ -927,7 +927,7 @@
       "get": {
         "operationId": "get_system_app_getTenantResources",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:authorize",
         "x-action": "app.getTenantResources",
         "x-group": "app",
         "responses": {
@@ -953,7 +953,7 @@
       "post": {
         "operationId": "post_system_app_authorizeApp",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:authorize",
         "x-action": "app.authorizeApp",
         "x-group": "app",
         "responses": {
@@ -989,7 +989,7 @@
       "post": {
         "operationId": "post_system_app_deauthorizeApp",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:authorize",
         "x-action": "app.deauthorizeApp",
         "x-group": "app",
         "responses": {
@@ -1025,7 +1025,7 @@
       "get": {
         "operationId": "get_system_org_query",
         "x-app-code": "basic",
-        "x-resource-code": "basic:organizations",
+        "x-resource-code": "basic:user:org",
         "x-action": "organization.read",
         "x-group": "org",
         "responses": {
@@ -1051,7 +1051,7 @@
       "get": {
         "operationId": "get_system_org_info",
         "x-app-code": "basic",
-        "x-resource-code": "basic:organizations",
+        "x-resource-code": "basic:user:org",
         "x-action": "organization.read",
         "x-group": "org",
         "responses": {
@@ -1077,7 +1077,7 @@
       "get": {
         "operationId": "get_system_org_delete",
         "x-app-code": "basic",
-        "x-resource-code": "basic:organizations",
+        "x-resource-code": "basic:user:org",
         "x-action": "organization.write",
         "x-group": "org",
         "responses": {
@@ -1103,7 +1103,7 @@
       "post": {
         "operationId": "post_system_org_save",
         "x-app-code": "basic",
-        "x-resource-code": "basic:organizations",
+        "x-resource-code": "basic:user:org",
         "x-action": "organization.write",
         "x-group": "org",
         "responses": {
@@ -1139,7 +1139,7 @@
       "get": {
         "operationId": "get_system_position_query",
         "x-app-code": "basic",
-        "x-resource-code": "basic:positions",
+        "x-resource-code": "basic:user:position",
         "x-action": "organization.read",
         "x-group": "position",
         "responses": {
@@ -1165,7 +1165,7 @@
       "get": {
         "operationId": "get_system_position_delete",
         "x-app-code": "basic",
-        "x-resource-code": "basic:positions",
+        "x-resource-code": "basic:user:position",
         "x-action": "organization.write",
         "x-group": "position",
         "responses": {
@@ -1191,7 +1191,7 @@
       "get": {
         "operationId": "get_system_position_setStatus",
         "x-app-code": "basic",
-        "x-resource-code": "basic:positions",
+        "x-resource-code": "basic:user:position",
         "x-action": "organization.write",
         "x-group": "position",
         "responses": {
@@ -1217,7 +1217,7 @@
       "get": {
         "operationId": "get_system_position_getItems",
         "x-app-code": "basic",
-        "x-resource-code": "basic:positions",
+        "x-resource-code": "basic:user:position",
         "x-action": "organization.read",
         "x-group": "position",
         "responses": {
@@ -1243,7 +1243,7 @@
       "post": {
         "operationId": "post_system_position_save",
         "x-app-code": "basic",
-        "x-resource-code": "basic:positions",
+        "x-resource-code": "basic:user:position",
         "x-action": "organization.write",
         "x-group": "position",
         "responses": {
@@ -1279,7 +1279,7 @@
       "get": {
         "operationId": "get_system_employee_query",
         "x-app-code": "basic",
-        "x-resource-code": "basic:members",
+        "x-resource-code": "basic:user:main",
         "x-action": "membership.read",
         "x-group": "employee",
         "responses": {
@@ -1305,7 +1305,7 @@
       "get": {
         "operationId": "get_system_employee_info",
         "x-app-code": "basic",
-        "x-resource-code": "basic:members",
+        "x-resource-code": "basic:user:main",
         "x-action": "membership.read",
         "x-group": "employee",
         "responses": {
@@ -1331,7 +1331,7 @@
       "get": {
         "operationId": "get_system_employee_getTenantApps",
         "x-app-code": "basic",
-        "x-resource-code": "basic:members",
+        "x-resource-code": "basic:user:main",
         "x-action": "membership.read",
         "x-group": "employee",
         "responses": {
@@ -1357,7 +1357,7 @@
       "get": {
         "operationId": "get_system_employee_queryTenantApps",
         "x-app-code": "basic",
-        "x-resource-code": "basic:members",
+        "x-resource-code": "basic:user:main",
         "x-action": "membership.read",
         "x-group": "employee",
         "responses": {
@@ -1402,7 +1402,7 @@
       "get": {
         "operationId": "get_system_employee_hasApp",
         "x-app-code": "basic",
-        "x-resource-code": "basic:members",
+        "x-resource-code": "basic:user:main",
         "x-action": "membership.read",
         "x-group": "employee",
         "responses": {
@@ -1428,7 +1428,7 @@
       "post": {
         "operationId": "post_system_employee_save",
         "x-app-code": "basic",
-        "x-resource-code": "basic:members",
+        "x-resource-code": "basic:user:main",
         "x-action": "membership.write",
         "x-group": "employee",
         "responses": {
@@ -1464,7 +1464,7 @@
       "get": {
         "operationId": "get_system_employee_setStatus",
         "x-app-code": "basic",
-        "x-resource-code": "basic:members",
+        "x-resource-code": "basic:user:main",
         "x-action": "membership.write",
         "x-group": "employee",
         "responses": {
@@ -1490,7 +1490,7 @@
       "get": {
         "operationId": "get_system_employee_delete",
         "x-app-code": "basic",
-        "x-resource-code": "basic:members",
+        "x-resource-code": "basic:user:main",
         "x-action": "membership.write",
         "x-group": "employee",
         "responses": {
@@ -1516,7 +1516,7 @@
       "get": {
         "operationId": "get_system_role_query",
         "x-app-code": "basic",
-        "x-resource-code": "basic:roles",
+        "x-resource-code": "basic:user:role",
         "x-action": "access.read",
         "x-group": "role",
         "responses": {
@@ -1542,7 +1542,7 @@
       "get": {
         "operationId": "get_system_role_delete",
         "x-app-code": "basic",
-        "x-resource-code": "basic:roles",
+        "x-resource-code": "basic:user:role",
         "x-action": "access.write",
         "x-group": "role",
         "responses": {
@@ -1568,7 +1568,7 @@
       "get": {
         "operationId": "get_system_role_setStatus",
         "x-app-code": "basic",
-        "x-resource-code": "basic:roles",
+        "x-resource-code": "basic:user:role",
         "x-action": "access.write",
         "x-group": "role",
         "responses": {
@@ -1594,7 +1594,7 @@
       "get": {
         "operationId": "get_system_role_queryRoleResources",
         "x-app-code": "basic",
-        "x-resource-code": "basic:roles",
+        "x-resource-code": "basic:user:role",
         "x-action": "access.read",
         "x-group": "role",
         "responses": {
@@ -1620,7 +1620,7 @@
       "post": {
         "operationId": "post_system_role_save",
         "x-app-code": "basic",
-        "x-resource-code": "basic:roles",
+        "x-resource-code": "basic:user:role",
         "x-action": "access.write",
         "x-group": "role",
         "responses": {
@@ -1656,7 +1656,7 @@
       "post": {
         "operationId": "post_system_role_authRoleResource",
         "x-app-code": "basic",
-        "x-resource-code": "basic:roles",
+        "x-resource-code": "basic:user:role",
         "x-action": "access.write",
         "x-group": "role",
         "responses": {
@@ -1692,7 +1692,7 @@
       "post": {
         "operationId": "post_system_role_relateEmployee",
         "x-app-code": "basic",
-        "x-resource-code": "basic:roles",
+        "x-resource-code": "basic:user:role",
         "x-action": "access.write",
         "x-group": "role",
         "responses": {
@@ -1728,7 +1728,7 @@
       "get": {
         "operationId": "get_system_config_districts",
         "x-app-code": "basic",
-        "x-resource-code": "basic:home",
+        "x-resource-code": "basic:dashboard",
         "x-action": "dictionary.read",
         "x-group": "config",
         "responses": {
@@ -1753,8 +1753,8 @@
     "/system/log/query": {
       "get": {
         "operationId": "get_system_log_query",
-        "x-app-code": "basic",
-        "x-resource-code": "basic:audit",
+        "x-app-code": "system",
+        "x-resource-code": "system:log:main",
         "x-action": "audit.read",
         "x-group": "log",
         "responses": {
@@ -1780,7 +1780,7 @@
       "get": {
         "operationId": "get_system_app_info_init",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:main",
         "x-action": "app/info.init",
         "x-group": "app/info",
         "responses": {
@@ -1802,7 +1802,7 @@
       "get": {
         "operationId": "get_system_app_info_servers",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:main",
         "x-action": "app/info.servers",
         "x-group": "app/info",
         "responses": {
@@ -1828,7 +1828,7 @@
       "get": {
         "operationId": "get_system_app_info_routes",
         "x-app-code": "system",
-        "x-resource-code": "system:applications",
+        "x-resource-code": "system:application:main",
         "x-action": "app/info.routes",
         "x-group": "app/info",
         "responses": {
@@ -1854,7 +1854,7 @@
       "post": {
         "operationId": "post_system_app_file_upload",
         "x-app-code": "basic",
-        "x-resource-code": "basic:home",
+        "x-resource-code": "basic:dashboard",
         "x-action": "app/file.upload",
         "x-group": "app/file",
         "responses": {
@@ -1981,6 +1981,10 @@
     "/app/file/limits": {
       "get": {
         "operationId": "get_app_file_limits",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:dashboard",
+        "x-action": "app/file.limits",
+        "x-group": "app/file",
         "summary": "Read configured upload limits",
         "x-public": true,
         "responses": {
@@ -2022,6 +2026,10 @@
     "/app/file/download": {
       "get": {
         "operationId": "get_app_file_download",
+        "x-app-code": "basic",
+        "x-resource-code": "basic:dashboard",
+        "x-action": "app/file.download",
+        "x-group": "app/file",
         "summary": "Download an authorized file as an attachment",
         "description": "Requires current tenant/app access. Supply id or key (both must match if supplied together). Use fetch with access-token and context headers, then create a local Blob URL. Never put the token in the URL. Private files cannot be fetched using /files/ or legacy static delivery.",
         "security": [

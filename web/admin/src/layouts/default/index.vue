@@ -1,6 +1,7 @@
 <template>
   <Layout :class="prefixCls" v-bind="lockEvents">
     <LayoutFeatures />
+    <AgentHost />
     <LayoutHeader fixed v-if="getShowFullHeaderRef" />
     <Layout :class="[layoutClass]">
       <LayoutSideBar v-if="getShowSidebar || getIsMobile" />
@@ -22,6 +23,7 @@
   import LayoutContent from './content/index.vue';
   import LayoutSideBar from './sider/index.vue';
   import LayoutMultipleHeader from './header/MultipleHeader.vue';
+  import AgentHost from './agent/AgentHost.vue';
 
   import { useHeaderSetting } from '/@/hooks/setting/useHeaderSetting';
   import { useMenuSetting } from '/@/hooks/setting/useMenuSetting';
@@ -39,6 +41,7 @@
       LayoutContent,
       LayoutSideBar,
       LayoutMultipleHeader,
+      AgentHost,
       Layout,
     },
     setup() {

@@ -1,5 +1,5 @@
 <template>
-  <div ref="viewerRef" id="markdownViewer" :class="$props.class"></div>
+  <div ref="viewerRef" :class="$props.class"></div>
 </template>
 
 <script lang="ts" setup>
@@ -18,6 +18,8 @@
 
   function init() {
     const viewerEl = unref(viewerRef) as HTMLElement;
+    if (!viewerEl) return;
+    destroy();
     vditorPreviewRef.value = VditorPreview.preview(viewerEl, props.value, {
       mode: getTheme(getDarkMode.value, 'content'),
       theme: {

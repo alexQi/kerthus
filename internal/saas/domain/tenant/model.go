@@ -17,6 +17,12 @@ type Tenant struct {
 	BootstrapVersion int64
 	CreatedAt        int64
 	UpdatedAt        int64
+	AgentProvider    string
+	AgentModel       string
+	AgentEndpoint    string
+	AgentAPIKey      string
+	AgentEnabled     bool
+	AgentProviders   string
 }
 
 type Member struct {
