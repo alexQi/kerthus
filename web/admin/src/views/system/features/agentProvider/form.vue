@@ -29,9 +29,9 @@
   import { Button, Select, message } from 'ant-design-vue';
   import { BasicForm, useForm } from '/@/components/Form';
   import { BasicDrawer, useDrawerInner } from '/@/components/Drawer';
-  import { getSaasConf, getToken } from '/@/utils/auth';
-  import { useGlobSetting } from '/@/hooks/setting';
+  import { getSaasConf } from '/@/utils/auth';
   import { saveData } from '/@/api/tenant/tenant';
+  import { syncProviderModels, testProviderModel } from '/@/api/agent/provider';
   import { formSchema } from './data';
   import { Icon } from '/@/components/Icon';
 
@@ -47,7 +47,6 @@
       const providers = ref<any[]>([]);
       const tenantId = ref(0);
       const draft = ref<any>({});
-      const { apiUrl = '' } = useGlobSetting();
       const [registerForm, { resetFields, setFieldsValue, validate }] = useForm({
         labelWidth: 110,
         baseColProps: { span: 24 },
@@ -84,32 +83,18 @@
           label: model.name || model.id || model,
         })),
       );
-      const headers = () => {
-        const token: any = getToken() || {};
-        return {
-          'Content-Type': 'application/json',
-          'access-token': token.access_token || '',
-          'tenant-id': String(tenantId.value),
-        };
-      };
       async function syncModels() {
         syncing.value = true;
         try {
           const values: any = await validate();
-          const res = await fetch(`${apiUrl}/api/agent/provider/models`, {
-            method: 'POST',
-            headers: headers(),
-            body: JSON.stringify(values),
-          });
-          const body = await res.json();
-          if (!res.ok || body.code !== 0) throw new Error(body.msg || '模型同步失败');
-          draft.value.models = body.data || [];
+          const models = await syncProviderModels(values);
+          draft.value.models = Array.isArray(models) ? models : [];
           await setFieldsValue({ models: draft.value.models });
-          if (!draft.value.model && body.data?.[0]) {
-            draft.value.model = body.data[0].id;
+          if (!draft.value.model && draft.value.models[0]) {
+            draft.value.model = draft.value.models[0].id;
             await setFieldsValue({ model: draft.value.model });
           }
-          message.success(`已同步 ${(body.data || []).length} 个模型`);
+          message.success(`已同步 ${draft.value.models.length} 个模型`);
         } catch (error: any) {
           message.error(error?.message || '模型同步失败');
         } finally {
@@ -120,13 +105,7 @@
         testing.value = true;
         try {
           const values: any = await validate();
-          const res = await fetch(`${apiUrl}/api/agent/provider/test`, {
-            method: 'POST',
-            headers: headers(),
-            body: JSON.stringify({ ...values, model: selectedModel.value || values.model }),
-          });
-          const body = await res.json();
-          if (!res.ok || body.code !== 0) throw new Error(body.msg || '模型连通性测试失败');
+          await testProviderModel({ ...values, model: selectedModel.value || values.model });
           message.success(`模型 ${selectedModel.value || values.model} 连通正常`);
         } catch (error: any) {
           message.error(error?.message || '模型连通性测试失败');

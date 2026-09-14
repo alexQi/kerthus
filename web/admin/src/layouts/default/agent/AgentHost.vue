@@ -57,8 +57,14 @@
   import { Button, Drawer, Empty, Textarea } from 'ant-design-vue';
   import { DoubleLeftOutlined, DoubleRightOutlined, LoadingOutlined, MessageOutlined, SendOutlined, StopOutlined } from '@ant-design/icons-vue';
   import { MarkdownViewer } from '/@/components/Markdown';
+  import {
+    createAgentSession,
+    getAgentSession,
+    listAgentSessions,
+    streamAgentMessage,
+    updateAgentSessionContext,
+  } from '/@/api/agent/session';
   import { getSaasConf, getToken } from '/@/utils/auth';
-  import { useGlobSetting } from '/@/hooks/setting';
   import 'vditor/dist/index.css';
 
   type SessionSummary = { session_id: string; title: string; message_count: number; updated_at: string };
@@ -90,18 +96,6 @@
         const token: any = getToken() || {};
         return `${token.user_id || 0}:${conf.tenantId || conf.tenant_id || token.tenant_id || 0}:${conf.appId || conf.app_id || token.app_id || 0}`;
       };
-      const headers = () => {
-        const conf: any = getSaasConf() || {};
-        const token: any = getToken() || {};
-        return {
-          'Content-Type': 'application/json',
-          'access-token': token.access_token || '',
-          'tenant-id': String(conf.tenantId || conf.tenant_id || token.tenant_id || 0),
-          'app-id': String(conf.appId || conf.app_id || token.app_id || 0),
-        };
-      };
-      const { apiUrl = '' } = useGlobSetting();
-      const agentUrl = (path: string) => `${apiUrl}${path}`;
       const context = () => ({ version: 'page_context.v1', route: window.location.hash.replace(/^#/, '') || route.fullPath, title: String(route.meta?.title || route.name || ''), locale: navigator.language, available_routes: router.getRoutes().map((item) => item.path).filter(Boolean) });
       const storageKey = (scope: string) => `kerthus.agent.session.${scope}`;
       const scrollToBottom = () => {
@@ -136,22 +130,18 @@
         return date.toLocaleString([], { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
       };
       const refreshSessions = async (signal?: AbortSignal) => {
-        const response = await fetch(agentUrl('/api/agent/sessions'), { headers: headers(), signal });
-        const body = await response.json().catch(() => ({}));
-        if (!response.ok || body.code !== 0) throw new Error(body.msg || '读取 Agent 对话列表失败');
-        sessions.value = Array.isArray(body.data) ? body.data : [];
+        sessions.value = await listAgentSessions(signal);
       };
       const loadSession = async (id: string) => {
         if (loading.value || sessionLoading.value || id === sessionId.value) return;
         sessionLoading.value = true;
         try {
-          const response = await fetch(agentUrl(`/api/agent/sessions/${encodeURIComponent(id)}`), { headers: headers() });
-          const body = await response.json().catch(() => ({}));
-          if (!response.ok || body.code !== 0 || !body.data?.session_id) throw new Error(body.msg || '读取 Agent 会话失败');
-          sessionId.value = body.data.session_id;
+          const data = await getAgentSession(id);
+          if (!data?.session_id) throw new Error('读取 Agent 会话失败');
+          sessionId.value = data.session_id;
           sessionScope.value = getSessionScope();
-          sessionPermissionVersion.value = body.data.permission_version || '';
-          restoreMessages(body.data.history);
+          sessionPermissionVersion.value = data.permission_version || '';
+          restoreMessages(data.history);
           rememberSession();
           scrollToBottom();
         } catch (error: any) {
@@ -175,27 +165,26 @@
           let saved = '';
           try { saved = localStorage.getItem(storageKey(scope)) || ''; } catch { /* storage may be unavailable */ }
           if (saved) {
-            const response = await fetch(agentUrl(`/api/agent/sessions/${encodeURIComponent(saved)}`), { headers: headers(), signal: controller.signal });
-            const body = await response.json().catch(() => ({}));
             if (getSessionScope() !== scope) throw new Error('应用上下文已变更，请重新发送');
-            if (response.ok && body.code === 0 && body.data?.session_id) {
-              sessionId.value = body.data.session_id;
-              sessionPermissionVersion.value = body.data.permission_version || '';
-              restoreMessages(body.data.history);
-              return;
-            }
-            if (body.code !== 404 && body.code !== 403 && response.status !== 404 && response.status !== 403) {
-              throw new Error(body.msg || '读取 Agent 会话失败');
+            try {
+              const data = await getAgentSession(saved, controller.signal);
+              if (data?.session_id) {
+                sessionId.value = data.session_id;
+                sessionPermissionVersion.value = data.permission_version || '';
+                restoreMessages(data.history);
+                return;
+              }
+            } catch (error: any) {
+              if (error?.status !== 404 && error?.status !== 403 && error?.code !== 404 && error?.code !== 403) throw error;
             }
             forgetSession(); sessionScope.value = scope;
           }
-          const response = await fetch(agentUrl('/api/agent/sessions'), { method: 'POST', headers: headers(), body: JSON.stringify({ context: context() }), signal: controller.signal });
-          const body = await response.json().catch(() => ({}));
+          const data = await createAgentSession(context(), controller.signal);
           if (getSessionScope() !== scope) throw new Error('应用上下文已变更，请重新发送');
-          if (!response.ok || body.code !== 0 || !body.data?.session_id) throw new Error(body.msg || 'Agent 会话创建失败');
-          sessionId.value = body.data.session_id;
+          if (!data?.session_id) throw new Error('Agent 会话创建失败');
+          sessionId.value = data.session_id;
           sessionScope.value = scope;
-          sessionPermissionVersion.value = body.data.permission_version || '';
+          sessionPermissionVersion.value = data.permission_version || '';
           rememberSession();
         })().finally(() => {
           window.clearTimeout(timeout);
@@ -211,15 +200,15 @@
           sessionId.value = ''; sessionScope.value = ''; messages.value = [];
           return;
         }
-        const response = await fetch(agentUrl(`/api/agent/sessions/${sessionId.value}/context`), { method: 'POST', headers: headers(), body: JSON.stringify({ context: context() }), signal });
-        const body = await response.json().catch(() => ({}));
-        if (!response.ok || body.code !== 0) {
-          if (body.code === 404 || body.code === 403) forgetSession();
-          throw new Error(body.msg || '更新页面上下文失败');
-        }
-        if (body.data?.permission_version !== sessionPermissionVersion.value) {
-          sessionPermissionVersion.value = body.data?.permission_version || '';
-          restoreMessages(body.data?.history);
+        try {
+          const data = await updateAgentSessionContext(sessionId.value, context(), signal);
+          if (data?.permission_version !== sessionPermissionVersion.value) {
+            sessionPermissionVersion.value = data?.permission_version || '';
+            restoreMessages(data?.history);
+          }
+        } catch (error: any) {
+          if (error?.status === 404 || error?.status === 403 || error?.code === 404 || error?.code === 403) forgetSession();
+          throw error;
         }
       };
       const newConversation = () => {
@@ -263,7 +252,7 @@
           await syncContext(controller.signal);
           if (controller.signal.aborted) throw new DOMException('请求已取消', 'AbortError');
           draft.value = ''; messages.value.push({ role: 'user', text });
-          const response = await fetch(agentUrl(`/api/agent/sessions/${sessionId.value}/messages`), { method: 'POST', headers: headers(), body: JSON.stringify({ message: text }), signal: controller.signal });
+          const response = await streamAgentMessage(sessionId.value, text, controller.signal);
           if (!response.ok || !response.body || !response.headers.get('content-type')?.includes('text/event-stream')) {
             const body = await response.json().catch(() => ({}));
             if (body.code === 404) forgetSession();

@@ -12,7 +12,8 @@ import { useGlobSetting } from '/@/hooks/setting';
 import { useMessage } from '/@/hooks/web/useMessage';
 import { ContentTypeEnum, RequestEnum, ResultEnum } from '/@/enums/httpEnum';
 import { isEmpty, isNull, isString, isUnDef } from '/@/utils/is';
-import { getSaasConf, getToken } from '/@/utils/auth';
+import { getToken } from '/@/utils/auth';
+import { getAuthHeaders } from './requestHeaders';
 import { deepMerge, setObjToUrlParams } from '/@/utils';
 import { useErrorLogStoreWithOut } from '/@/store/modules/errorLog';
 import { useI18n } from '/@/hooks/web/useI18n';
@@ -152,19 +153,7 @@ const transform: AxiosTransform = {
     // 请求之前处理config
     const token = getToken();
     if (token && (config as Recordable)?.requestOptions?.withToken !== false) {
-      const saasConf = getSaasConf();
-      // jwt token
-      (config as Recordable).headers['access-token'] = token.access_token;
-      (config as Recordable).headers['tenant-id'] = saasConf?.tenantId
-        ? saasConf.tenantId
-        : token.tenant_id;
-      (config as Recordable).headers['unit-id'] = saasConf?.unitId
-        ? saasConf.unitId
-        : token.unit_id;
-      (config as Recordable).headers['section-id'] = saasConf?.sectionId
-        ? saasConf.sectionId
-        : token.section_id;
-      (config as Recordable).headers['app-id'] = saasConf?.appId ? saasConf.appId : token.app_id;
+      Object.assign((config as Recordable).headers, getAuthHeaders());
     }
     return config;
   },

@@ -4,7 +4,7 @@
 <script lang="ts" setup>
   import { h } from 'vue';
   import { BasicTable, useTable } from '/@/components/Table';
-  import { defHttp } from '/@/utils/http/axios';
+  import { getAuditLogList } from '/@/api/system/log';
   import { formatToDateTime } from '/@/utils/dateUtil';
   const entities: Record<string, string> = {
     user: '账号', tenant: '租户', member: '成员', organization: '组织',
@@ -38,7 +38,7 @@
   const identityLabel = (label: string, value: unknown) => Number(value) > 0 ? `${label} #${value}` : '—';
   const [registerTable] = useTable({
     title: '审计日志', rowKey: 'id', bordered: true, showTableSetting: true,
-    api: (params) => defHttp.get({ url: '/system/log/query', params }),
+    api: getAuditLogList,
     columns: [
       { title: '事件编号', dataIndex: 'id', width: 90 },
       { title: '时间', dataIndex: 'created_at', width: 180,

@@ -28,6 +28,10 @@ yarn preview:dist --host 127.0.0.1 --port 15173
 
 动态菜单和首页由 SaaS 接口及应用 manifest 提供。新增已打包应用的页面放入 `src/views/apps/<appCode>`，然后注册匹配 component 的 manifest，并重新构建前端。当前复用单一管理前端，没有引入微前端运行时。
 
+## 接口请求规范
+
+业务接口统一在 `src/api` 定义，由 Axios 请求拦截器注入公共鉴权和租户上下文。页面与组件只调用 API 方法，不直接拼接 URL 或请求头。Agent SSE 等浏览器原生流式请求也必须封装在 `src/api`，详情见[前端接口请求规范](../docs/architecture/frontend-api-request-standard.md)。
+
 ## 已修正的迁移差异
 
 - 首页优先使用当前应用 manifest 声明且用户可访问的页面，否则进入首个授权页面；没有可访问页面时进入个人设置并提示联系管理员授权。切换应用与退出清理动态路由、菜单、权限和页签。
