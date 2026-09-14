@@ -31,19 +31,19 @@
           ><TableAction
             :actions="[
               {
-                label: '测试连通',
                 icon: 'ant-design:api-outlined',
+                tooltip: '测试连通',
                 onClick: handleTest.bind(null, record),
               },
               {
-                label: '编辑',
                 icon: 'clarity:note-edit-line',
+                tooltip: '编辑',
                 onClick: handleEdit.bind(null, record),
               },
               {
-                label: '删除',
                 icon: 'ant-design:delete-outlined',
                 color: 'error',
+                tooltip: '删除',
                 popConfirm: {
                   title: '是否确认删除',
                   placement: 'left',
@@ -99,7 +99,7 @@
         showTableSetting: true,
         bordered: true,
         showIndexColumn: false,
-        actionColumn: { width: 250, title: '操作', dataIndex: 'action', fixed: undefined },
+        actionColumn: { width: 120, title: '操作', dataIndex: 'action', fixed: undefined },
       });
       function providerLabel(provider: string) {
         return provider === 'openai' ? 'OpenAI 兼容' : provider || '未设置';
