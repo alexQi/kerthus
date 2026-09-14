@@ -152,7 +152,92 @@ func TestRuntimeStreamsToolsAndPersistsProtocolAcrossFreshRuntime(t *testing.T) 
 	}
 }
 
+func TestRuntimeRetriesTransientUpstreamFailure(t *testing.T) {
+	previousDelays := upstreamRetryDelays
+	upstreamRetryDelays = [...]time.Duration{time.Millisecond, time.Millisecond, time.Millisecond, time.Millisecond, time.Millisecond}
+	defer func() { upstreamRetryDelays = previousDelays }()
+
+	var requests atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		request := requests.Add(1)
+		if request == 1 {
+			w.WriteHeader(http.StatusBadGateway)
+			_, _ = io.WriteString(w, `{"error":{"type":"temporary"}}`)
+			return
+		}
+		var body struct {
+			Model string `json:"model"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.Model != "test" {
+			t.Fatalf("retry did not resend request body: %#v, %v", body, err)
+		}
+		w.Header().Set("Content-Type", "text/event-stream")
+		sendChunk(w, "ok")
+		finishRound(w, "stop")
+	}))
+	defer srv.Close()
+
+	s, err := testRuntime(t, srv.URL).Stream(context.Background(), "retry me")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	for {
+		event, recvErr := s.Recv()
+		if recvErr != nil {
+			t.Fatal(recvErr)
+		}
+		if event.Type == microagent.StreamEventDone {
+			break
+		}
+	}
+	if got := requests.Load(); got != 2 {
+		t.Fatalf("upstream requests = %d, want 2", got)
+	}
+}
+
+func TestRuntimeRetriesSSEProviderErrorBeforeTokens(t *testing.T) {
+	previousDelays := upstreamRetryDelays
+	upstreamRetryDelays = [...]time.Duration{time.Millisecond, time.Millisecond, time.Millisecond, time.Millisecond, time.Millisecond}
+	defer func() { upstreamRetryDelays = previousDelays }()
+
+	var requests atomic.Int32
+	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if requests.Add(1) == 1 {
+			w.Header().Set("Content-Type", "text/event-stream")
+			_, _ = io.WriteString(w, "data: {\"error\":{\"message\":\"temporary upstream failure\"}}\n\ndata: [DONE]\n\n")
+			return
+		}
+		w.Header().Set("Content-Type", "text/event-stream")
+		sendChunk(w, "recovered")
+		finishRound(w, "stop")
+	}))
+	defer srv.Close()
+
+	s, err := testRuntime(t, srv.URL).Stream(context.Background(), "retry stream")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer s.Close()
+	for {
+		event, recvErr := s.Recv()
+		if recvErr != nil {
+			t.Fatal(recvErr)
+		}
+		if event.Type == microagent.StreamEventDone {
+			break
+		}
+	}
+	if got := requests.Load(); got != 2 {
+		t.Fatalf("upstream requests = %d, want 2", got)
+	}
+}
+
 func TestRuntimeRejectsEmptyErrorAndTruncatedStreams(t *testing.T) {
+	previousDelays := upstreamRetryDelays
+	upstreamRetryDelays = [...]time.Duration{time.Millisecond, time.Millisecond, time.Millisecond, time.Millisecond, time.Millisecond}
+	defer func() { upstreamRetryDelays = previousDelays }()
+
 	tests := map[string]string{
 		"empty":               "data: {\"choices\":[{\"delta\":{},\"finish_reason\":\"stop\"}]}\n\ndata: [DONE]\n\n",
 		"error":               "data: {\"error\":{\"message\":\"upstream-secret\"}}\n\n",

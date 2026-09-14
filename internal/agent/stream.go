@@ -20,6 +20,16 @@ import (
 
 const maxRoundBytes = 4 << 20
 
+const maxUpstreamRetries = 5
+
+var upstreamRetryDelays = [...]time.Duration{
+	5 * time.Second,
+	10 * time.Second,
+	10 * time.Second,
+	10 * time.Second,
+	10 * time.Second,
+}
+
 func (r *Runtime) run(ctx context.Context, prompt string, history []Message, emit func(*microagent.StreamEvent) error) ([]Message, error) {
 	messages := append(append([]Message(nil), history...), Message{Role: "user", Content: prompt})
 	repeats := map[string]int{}
@@ -104,22 +114,96 @@ func (r *Runtime) round(ctx context.Context, history []Message, emit func(*micro
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "text/event-stream")
 	req.Header.Set("Authorization", "Bearer "+r.config.APIKey)
-	resp, err := r.client.Do(req)
-	if err != nil {
-		if ctx.Err() != nil {
-			return Message{}, ctx.Err()
+	var lastErr error
+	for attempt := 0; attempt <= maxUpstreamRetries; attempt++ {
+		if attempt > 0 && req.GetBody != nil {
+			body, bodyErr := req.GetBody()
+			if bodyErr != nil {
+				return Message{}, errors.New("无法重试模型请求")
+			}
+			req.Body = body
 		}
-		return Message{}, errors.New("无法连接模型服务")
+		resp, requestErr := r.client.Do(req)
+		if requestErr != nil {
+			if ctx.Err() != nil {
+				return Message{}, ctx.Err()
+			}
+			lastErr = errors.New("无法连接模型服务")
+			if attempt == maxUpstreamRetries {
+				return Message{}, lastErr
+			}
+			if err := waitUpstreamRetry(ctx, attempt); err != nil {
+				return Message{}, err
+			}
+			continue
+		}
+
+		if resp.StatusCode != http.StatusOK {
+			lastErr = fmt.Errorf("模型服务返回 HTTP %d: %s", resp.StatusCode, readModelError(resp.Body))
+			_ = resp.Body.Close()
+			if !retryableUpstreamStatus(resp.StatusCode) || attempt == maxUpstreamRetries {
+				return Message{}, lastErr
+			}
+			if err := waitUpstreamRetry(ctx, attempt); err != nil {
+				return Message{}, err
+			}
+			continue
+		}
+
+		media, _, _ := mime.ParseMediaType(resp.Header.Get("Content-Type"))
+		if media != "text/event-stream" {
+			lastErr = fmt.Errorf("模型服务未返回 SSE 流: %s", readModelError(resp.Body))
+			_ = resp.Body.Close()
+			return Message{}, lastErr
+		}
+		emitted := false
+		emitAttempt := func(event *microagent.StreamEvent) error {
+			if event != nil && event.Type == microagent.StreamEventToken {
+				emitted = true
+			}
+			return emit(event)
+		}
+		result, streamErr := readCompletion(resp.Body, emitAttempt)
+		_ = resp.Body.Close()
+		if streamErr != nil && !emitted && retryableStreamError(streamErr) && attempt < maxUpstreamRetries {
+			lastErr = streamErr
+			if err := waitUpstreamRetry(ctx, attempt); err != nil {
+				return Message{}, err
+			}
+			continue
+		}
+		return result, streamErr
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusOK {
-		return Message{}, fmt.Errorf("模型服务返回 HTTP %d: %s", resp.StatusCode, readModelError(resp.Body))
+	return Message{}, lastErr
+}
+
+func retryableUpstreamStatus(status int) bool {
+	return status == http.StatusRequestTimeout || status == http.StatusTooManyRequests || status >= 500
+}
+
+func retryableStreamError(err error) bool {
+	if err == nil {
+		return false
 	}
-	media, _, _ := mime.ParseMediaType(resp.Header.Get("Content-Type"))
-	if media != "text/event-stream" {
-		return Message{}, fmt.Errorf("模型服务未返回 SSE 流: %s", readModelError(resp.Body))
+	message := err.Error()
+	return strings.HasPrefix(message, "模型服务返回流式错误:") ||
+		strings.HasPrefix(message, "模型服务返回错误:") ||
+		message == "模型流式连接中断"
+}
+
+func waitUpstreamRetry(ctx context.Context, attempt int) error {
+	delay := upstreamRetryDelays[len(upstreamRetryDelays)-1]
+	if attempt >= 0 && attempt < len(upstreamRetryDelays) {
+		delay = upstreamRetryDelays[attempt]
 	}
-	return readCompletion(resp.Body, emit)
+	timer := time.NewTimer(delay)
+	defer timer.Stop()
+	select {
+	case <-timer.C:
+		return nil
+	case <-ctx.Done():
+		return ctx.Err()
+	}
 }
 
 type completionChunk struct {

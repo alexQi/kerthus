@@ -19,20 +19,31 @@ import (
 	"kerthus/internal/saas/domain/fault"
 )
 
-type conversationPlatform struct{ mockPlatform }
+type conversationPlatform struct {
+	mockPlatform
+	name string
+}
 
 func (p *conversationPlatform) Auth(ctx context.Context, c *pb.Context, _ ...client.CallOption) (*pb.AuthReply, error) {
 	if c.GetToken() != "test-token" {
 		return nil, fault.Unauthorized
 	}
-	return &pb.AuthReply{PlatformAdmin: true, Context: &pb.LoginReply{UserId: 1}}, nil
+	return &pb.AuthReply{PlatformAdmin: true, Roles: []string{"admin"}, Context: &pb.LoginReply{
+		UserId: 1, TenantId: c.GetTenantId(), AppId: c.GetAppId(), AppCode: "basic", UnitId: 4, SectionId: 5,
+	}}, nil
+}
+func (p *conversationPlatform) Profile(ctx context.Context, c *pb.Context, _ ...client.CallOption) (*pb.User, error) {
+	return &pb.User{Id: 1, Name: p.name, Phone: "private-phone", Email: "private-email"}, nil
 }
 func (p *conversationPlatform) Query(ctx context.Context, q *pb.QueryRequest, _ ...client.CallOption) (*pb.QueryReply, error) {
+	if q.Kind == pb.Kind_APPS {
+		return &pb.QueryReply{Apps: []*pb.App{{Id: 3, Code: "basic", Name: "企业管理"}}}, nil
+	}
 	key := "********"
 	if q.IncludeAgentCredentials {
 		key = "stored-test-key"
 	}
-	return &pb.QueryReply{Tenants: []*pb.Tenant{{Id: 2, AgentEnabled: true, AgentProvider: "openai", AgentModel: "test", AgentEndpoint: "https://provider.example/v1", AgentApiKey: key}}}, nil
+	return &pb.QueryReply{Tenants: []*pb.Tenant{{Id: 2, Name: "测试租户", AgentEnabled: true, AgentProvider: "openai", AgentModel: "test", AgentEndpoint: "https://provider.example/v1", AgentApiKey: key}}}, nil
 }
 
 type rewriteAgentTransport struct{ target string }
@@ -67,8 +78,26 @@ func TestAgentHTTPStreamsBeforeCompletionAndRestoresHistory(t *testing.T) {
 		if !body.Stream || r.Header.Get("Authorization") != "Bearer stored-test-key" {
 			t.Error("stream request did not use stored credentials")
 		}
+		if len(body.Messages) == 0 || body.Messages[0].Role != "system" {
+			t.Error("missing trusted system context")
+			return
+		}
+		prompt := body.Messages[0].Content
+		for _, required := range []string{`"user_id":1`, `"tenant_id":2`, `"tenant_name":"测试租户"`, `"app_id":3`, `"app_name":"企业管理"`, `"role_codes":["admin"]`, `"unit_id":4`, `"section_id":5`} {
+			if !strings.Contains(prompt, required) {
+				t.Errorf("upstream did not receive verified identity: missing %s", required)
+			}
+		}
+		for _, secret := range []string{"stored-test-key", "test-token", "private-phone", "private-email"} {
+			if strings.Contains(prompt, secret) {
+				t.Error("unnecessary private fields entered system context")
+			}
+		}
 		w.Header().Set("Content-Type", "text/event-stream")
 		if requests.Add(1) == 1 {
+			if !strings.Contains(prompt, `"display_name":"初始账号"`) {
+				t.Error("first turn did not load profile")
+			}
 			fmt.Fprint(w, "data: {\"choices\":[{\"delta\":{\"content\":\"记住蓝莓\"}}]}\n\n")
 			w.(http.Flusher).Flush()
 			select {
@@ -77,6 +106,9 @@ func TestAgentHTTPStreamsBeforeCompletionAndRestoresHistory(t *testing.T) {
 				return
 			}
 		} else {
+			if !strings.Contains(prompt, `"display_name":"更新账号"`) || strings.Contains(prompt, "初始账号") {
+				t.Error("continued conversation reused stale profile context")
+			}
 			if len(body.Messages) != 4 || body.Messages[1].Content != "记住蓝莓" || body.Messages[2].Content != "记住蓝莓" || body.Messages[3].Content != "刚才的词是什么" {
 				t.Errorf("history lost between HTTP requests: %#v", body.Messages)
 			}
@@ -87,7 +119,7 @@ func TestAgentHTTPStreamsBeforeCompletionAndRestoresHistory(t *testing.T) {
 	defer upstream.Close()
 	store := agentcore.NewSessionStore()
 	conf := Config{AgentStore: store, AgentHTTPClient: &http.Client{Transport: rewriteAgentTransport{upstream.URL}}}
-	server := httptest.NewServer(New(&conversationPlatform{}, conf))
+	server := httptest.NewServer(New(&conversationPlatform{name: "初始账号"}, conf))
 	defer server.Close()
 	c := &http.Client{Timeout: 5 * time.Second}
 	resp, err := c.Do(conversationRequest("POST", server.URL+"/api/agent/sessions", `{"context":{"route":"/basic/dashboard"}}`))
@@ -154,7 +186,7 @@ func TestAgentHTTPStreamsBeforeCompletionAndRestoresHistory(t *testing.T) {
 	}
 	resp.Body.Close()
 	// New gateway instance, same session backend: retrieval and next turn work.
-	reopened := httptest.NewServer(New(&conversationPlatform{}, conf))
+	reopened := httptest.NewServer(New(&conversationPlatform{name: "更新账号"}, conf))
 	defer reopened.Close()
 	restored, err := c.Do(conversationRequest("GET", reopened.URL+endpoint, ""))
 	if err != nil {

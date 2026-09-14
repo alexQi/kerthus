@@ -3,7 +3,7 @@
     <a-button class="agent-trigger" type="primary" shape="circle" size="large" @click="open = true">
       <template #icon><MessageOutlined /></template>
     </a-button>
-    <a-drawer v-model:visible="open" title="Agent 对话" placement="right" :width="drawerWidth" :body-style="{ padding: 0 }" :destroy-on-close="false">
+    <a-drawer v-model:visible="open" title="AI助手" placement="right" :width="drawerWidth" :body-style="{ padding: 0 }" :destroy-on-close="false">
       <template #extra><a-button type="link" :disabled="loading || sessionLoading" @click="newConversation">新对话</a-button></template>
       <div class="agent-layout">
         <aside :class="['agent-sessions', { collapsed: sessionsCollapsed }]">
@@ -27,7 +27,7 @@
           <div ref="messageContainer" class="agent-messages">
             <a-empty v-if="!messages.length" description="可以询问当前页面的数据和操作" />
             <div v-for="(item, index) in messages" :key="index" :class="['agent-message-row', item.role]">
-              <div class="agent-message-label">{{ item.role === 'user' ? '你' : item.role === 'assistant' ? 'Agent' : '系统' }}</div>
+              <div class="agent-message-label">{{ item.role === 'user' ? '你' : item.role === 'assistant' ? 'AI助手' : '系统' }}</div>
           <div class="agent-message">
             <div v-if="item.role === 'assistant' && index === messages.length - 1 && !item.text && loading" class="agent-thinking"><LoadingOutlined spin /><span>{{ progress }}</span></div>
             <template v-else-if="item.role === 'assistant'">
@@ -40,7 +40,7 @@
           </div>
           <div class="agent-composer">
             <a-textarea v-model:value="draft" :rows="2" :placeholder="loading ? '正在等待回复…' : '输入消息，Shift+Enter 换行'" :disabled="sessionLoading" @keydown="handleComposerKeydown" />
-            <a-button class="agent-send" type="primary" :danger="loading" :loading="false" :disabled="!loading && !draft.trim()" @click="loading ? stop : send">
+            <a-button class="agent-send" type="primary" :danger="loading" :loading="false" :disabled="!loading && !draft.trim()" @click="loading ? stop() : send()">
               <template #icon><StopOutlined v-if="loading" /><SendOutlined v-else /></template>
               {{ loading ? '停止' : '发送' }}
             </a-button>
