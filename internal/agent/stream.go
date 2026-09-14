@@ -113,11 +113,11 @@ func (r *Runtime) round(ctx context.Context, history []Message, emit func(*micro
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		return Message{}, fmt.Errorf("模型服务返回 HTTP %d", resp.StatusCode)
+		return Message{}, fmt.Errorf("模型服务返回 HTTP %d: %s", resp.StatusCode, readModelError(resp.Body))
 	}
 	media, _, _ := mime.ParseMediaType(resp.Header.Get("Content-Type"))
 	if media != "text/event-stream" {
-		return Message{}, errors.New("模型服务未返回 SSE 流")
+		return Message{}, fmt.Errorf("模型服务未返回 SSE 流: %s", readModelError(resp.Body))
 	}
 	return readCompletion(resp.Body, emit)
 }
@@ -140,6 +140,44 @@ type completionChunk struct {
 	} `json:"choices"`
 }
 
+// readModelError keeps only bounded, non-sensitive classification data from an
+// upstream error. Provider messages may contain credentials, prompts, or
+// account identifiers, so they are deliberately never returned to the UI.
+func readModelError(body io.Reader) string {
+	raw, _ := io.ReadAll(io.LimitReader(body, 4096))
+	if len(raw) == 0 {
+		return "上游未提供错误详情"
+	}
+	var envelope struct {
+		Message string `json:"message"`
+		Error   struct {
+			Message string `json:"message"`
+			Type    string `json:"type"`
+			Code    any    `json:"code"`
+		} `json:"error"`
+	}
+	if json.Unmarshal(raw, &envelope) == nil {
+		if envelope.Error.Type != "" {
+			return "上游错误类型: " + truncateModelError(envelope.Error.Type)
+		}
+		if envelope.Error.Code != nil {
+			return "上游错误代码: " + truncateModelError(fmt.Sprint(envelope.Error.Code))
+		}
+		if envelope.Error.Message != "" || envelope.Message != "" {
+			return "上游返回了错误详情"
+		}
+	}
+	return "上游返回了不可识别的错误详情"
+}
+
+func truncateModelError(value string) string {
+	value = strings.Join(strings.Fields(value), " ")
+	if len(value) > 512 {
+		return value[:512] + "…"
+	}
+	return value
+}
+
 // readCompletion assembles only tool arguments; answer tokens are forwarded
 // immediately. Both a finish reason and the terminal frame are required so a
 // truncated stream can never be persisted as a successful assistant turn.
@@ -159,7 +197,7 @@ func readCompletion(body io.Reader, emit func(*microagent.StreamEvent) error) (M
 		raw := strings.Join(data, "\n")
 		data = nil
 		if eventType == "error" {
-			return false, errors.New("模型服务返回流式错误")
+			return false, fmt.Errorf("模型服务返回流式错误: %s", readModelError(strings.NewReader(raw)))
 		}
 		if strings.TrimSpace(raw) == "[DONE]" {
 			return true, nil
@@ -169,7 +207,7 @@ func readCompletion(body io.Reader, emit func(*microagent.StreamEvent) error) (M
 			return false, errors.New("模型流式响应格式错误")
 		}
 		if len(chunk.Error) > 0 && string(chunk.Error) != "null" {
-			return false, errors.New("模型服务返回错误")
+			return false, fmt.Errorf("模型服务返回错误: %s", readModelError(bytes.NewReader(chunk.Error)))
 		}
 		for _, choice := range chunk.Choices {
 			if choice.Index != 0 {

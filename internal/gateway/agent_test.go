@@ -236,3 +236,62 @@ func TestAgentRouteToolsAreFilteredByCurrentAppAccess(t *testing.T) {
 		}
 	}
 }
+
+type providerToolsPlatform struct{ mockPlatform }
+
+func (m *providerToolsPlatform) Query(ctx context.Context, q *pb.QueryRequest, _ ...client.CallOption) (*pb.QueryReply, error) {
+	if q.GetKind() == pb.Kind_APPS {
+		return &pb.QueryReply{Apps: []*pb.App{{Id: q.GetId(), Code: "basic"}}}, nil
+	}
+	return &pb.QueryReply{Total: 1, Tenants: []*pb.Tenant{{Id: 9, AgentProviders: `[{"code":"main","name":"主 Provider","provider":"openai","model":"gpt-test","endpoint":"https://provider.example/v1","api_key":"secret-value","models":[{"id":"gpt-test","name":"GPT Test"}],"enabled":true,"default":true}]`}}}, nil
+}
+
+func TestBasicAgentInjectsProviderToolsForProviderPermission(t *testing.T) {
+	g := &Gateway{client: &providerToolsPlatform{}}
+	a := &pb.Context{TenantId: 9, AppId: 2}
+	auth := &pb.AuthReply{Permissions: []string{"basic:system:provider"}, Context: &pb.LoginReply{UserId: 7, TenantId: 9, AppId: 2}}
+	tools := g.agentToolOptions(a, auth, httptest.NewRequest(http.MethodPost, "/api/agent/sessions/x/messages", nil))
+	seen := map[string]agentcore.Tool{}
+	for _, tool := range tools {
+		seen[tool.Definition.Name] = tool
+	}
+	for _, name := range []string{"provider_list", "provider_models", "provider_test"} {
+		if seen[name].Handler == nil {
+			t.Fatalf("provider tool %q was not injected", name)
+		}
+	}
+	raw, err := seen["provider_list"].Handler(context.Background(), map[string]any{"payload": map[string]any{}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(raw, "secret-value") || !strings.Contains(raw, "gpt-test") {
+		t.Fatalf("provider tool returned unsafe or incomplete data: %s", raw)
+	}
+}
+
+func TestBasicAgentDoesNotInjectProviderToolsWithoutPermission(t *testing.T) {
+	g := &Gateway{client: &providerToolsPlatform{}}
+	a := &pb.Context{TenantId: 9, AppId: 2}
+	auth := &pb.AuthReply{Permissions: []string{"basic:system:dashboard"}, Context: &pb.LoginReply{UserId: 7, TenantId: 9, AppId: 2}}
+	for _, tool := range g.agentToolOptions(a, auth, httptest.NewRequest(http.MethodPost, "/api/agent/sessions/x/messages", nil)) {
+		if strings.HasPrefix(tool.Definition.Name, "provider_") {
+			t.Fatalf("provider tool %q was injected without provider permission", tool.Definition.Name)
+		}
+	}
+}
+
+func TestBasicAgentToolManifestIncludesProviderCapabilities(t *testing.T) {
+	g := &Gateway{client: &providerToolsPlatform{}}
+	a := &pb.Context{TenantId: 9, AppId: 2}
+	auth := &pb.AuthReply{Permissions: []string{"basic:system:provider"}, Context: &pb.LoginReply{UserId: 7, TenantId: 9, AppId: 2}}
+	manifests := g.availableAgentTools(context.Background(), a, auth)
+	seen := map[string]bool{}
+	for _, item := range manifests {
+		seen[item.ID] = true
+	}
+	for _, id := range []string{"provider.list", "provider.models", "provider.test"} {
+		if !seen[id] {
+			t.Fatalf("provider manifest %q was not exposed", id)
+		}
+	}
+}

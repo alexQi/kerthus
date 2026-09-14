@@ -134,17 +134,35 @@ func (g *Gateway) agentProviderModels(w http.ResponseWriter, r *http.Request) {
 		writeError(w, fault.Invalid("Provider Endpoint 格式不正确"))
 		return
 	}
-	req, _ := http.NewRequestWithContext(r.Context(), http.MethodGet, u.String(), nil)
-	req.Header.Set("Authorization", "Bearer "+apiKey)
-	resp, err := (&http.Client{Timeout: 30 * time.Second}).Do(req)
+	models, err := fetchAgentProviderModels(r.Context(), u, apiKey, g.config.AgentHTTPClient)
 	if err != nil {
-		writeError(w, fault.New(502, "无法连接 Provider 模型接口"))
+		writeError(w, fault.New(502, err.Error()))
 		return
+	}
+	WriteSuccess(w, models)
+}
+
+func fetchAgentProviderModels(ctx context.Context, endpoint *url.URL, apiKey string, configured *http.Client) ([]map[string]string, error) {
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint.String(), nil)
+	if err != nil {
+		return nil, errors.New("Provider 模型接口地址不正确")
+	}
+	req.Header.Set("Authorization", "Bearer "+apiKey)
+	client := &http.Client{Timeout: 30 * time.Second}
+	if configured != nil {
+		*client = *configured
+		if client.Timeout == 0 {
+			client.Timeout = 30 * time.Second
+		}
+	}
+	client.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, errors.New("无法连接 Provider 模型接口")
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
-		writeError(w, fault.New(502, "Provider 模型接口返回错误"))
-		return
+		return nil, errors.New("Provider 模型接口返回错误")
 	}
 	var body struct {
 		Data []struct {
@@ -153,20 +171,20 @@ func (g *Gateway) agentProviderModels(w http.ResponseWriter, r *http.Request) {
 		} `json:"data"`
 	}
 	if err = json.NewDecoder(io.LimitReader(resp.Body, 1<<20)).Decode(&body); err != nil {
-		writeError(w, fault.New(502, "Provider 模型响应格式错误"))
-		return
+		return nil, errors.New("Provider 模型响应格式错误")
 	}
 	models := make([]map[string]string, 0, len(body.Data))
 	for _, m := range body.Data {
-		if m.ID != "" {
-			name := m.Name
-			if name == "" {
-				name = m.ID
-			}
-			models = append(models, map[string]string{"id": m.ID, "name": name})
+		if m.ID == "" {
+			continue
 		}
+		name := m.Name
+		if name == "" {
+			name = m.ID
+		}
+		models = append(models, map[string]string{"id": m.ID, "name": name})
 	}
-	WriteSuccess(w, models)
+	return models, nil
 }
 
 func (g *Gateway) agentProviderTest(w http.ResponseWriter, r *http.Request) {
@@ -297,6 +315,13 @@ func (g *Gateway) availableAgentTools(requestCtx context.Context, actor *pb.Cont
 	appCode := g.agentAppCode(checkCtx, actor)
 	if auth.GetPlatformAdmin() && appCode == "system" {
 		out = append(out, agentcore.ToolManifest{ID: "tenant.list", Version: "1", Name: "查询全部租户", Description: "查询平台中的全部租户，只返回基础信息，不包含 Provider 密钥。", Risk: agentcore.RiskRead, TargetService: "platform", TimeoutMilliseconds: 5000, Idempotent: true})
+	}
+	if appCode == "basic" && canManageAgentProvider(auth) {
+		out = append(out,
+			agentcore.ToolManifest{ID: "provider.list", Version: "1", Name: "查看模型提供商", Description: "查看当前租户的模型提供商、模型和默认状态，不返回 API 密钥。", RequiredScopes: []string{"basic:system:provider"}, Risk: agentcore.RiskRead, TargetService: "gateway", TimeoutMilliseconds: 5000, Idempotent: true},
+			agentcore.ToolManifest{ID: "provider.models", Version: "1", Name: "同步提供商模型", Description: "从当前租户已配置的模型提供商同步可用模型。", RequiredScopes: []string{"basic:system:provider"}, Risk: agentcore.RiskRead, TargetService: "gateway", TimeoutMilliseconds: 30000, Idempotent: true},
+			agentcore.ToolManifest{ID: "provider.test", Version: "1", Name: "测试提供商模型", Description: "测试当前租户已配置模型的连通性。", RequiredScopes: []string{"basic:system:provider"}, Risk: agentcore.RiskRead, TargetService: "gateway", TimeoutMilliseconds: 30000, Idempotent: true},
+		)
 	}
 	for path, route := range g.routes {
 		if path == "/healthz" || path == "/app/info/init" {
@@ -600,8 +625,10 @@ type tenantProvider struct {
 	Code       string `json:"code"`
 	ProviderID string `json:"provider_id"`
 	ID         string `json:"id"`
+	Name       string `json:"name"`
 	Provider   string `json:"provider"`
 	Model      string `json:"model"`
+	Models     []any  `json:"models,omitempty"`
 	Endpoint   string `json:"endpoint"`
 	APIKey     string `json:"api_key"`
 	Enabled    bool   `json:"enabled"`
@@ -761,6 +788,7 @@ func (g *Gateway) agentToolOptions(actor *pb.Context, auth *pb.AuthReply, reques
 			return string(b), nil
 		}})
 	}
+	options = append(options, g.agentProviderTools(actor, auth, appCode)...)
 	for path, route := range g.routes {
 		if path == "/healthz" || path == "/app/info/init" || !route.check {
 			continue
@@ -801,6 +829,125 @@ func (g *Gateway) agentToolOptions(actor *pb.Context, auth *pb.AuthReply, reques
 		}})
 	}
 	return options
+}
+
+// agentProviderTools exposes provider administration only while the user is in
+// the Basic application and has the provider resource (or an equivalent
+// tenant-management grant). Provider credentials are used only inside the
+// gateway and are never included in tool definitions or results.
+func (g *Gateway) agentProviderTools(actor *pb.Context, auth *pb.AuthReply, appCode string) []agentcore.Tool {
+	if actor == nil || auth == nil || appCode != "basic" || !canManageAgentProvider(auth) {
+		return nil
+	}
+	queryTenant := func(ctx context.Context) (*pb.Tenant, error) {
+		q, err := g.client.Query(rpcauth.WithCredential(ctx, g.config.GatewayKey), &pb.QueryRequest{Context: actor, Kind: pb.Kind_TENANTS, Id: actor.GetTenantId(), IncludeAgentCredentials: true})
+		if err != nil {
+			return nil, err
+		}
+		if q == nil || len(q.GetTenants()) == 0 {
+			return nil, fault.NotFound
+		}
+		return q.GetTenants()[0], nil
+	}
+	selectProvider := func(t *pb.Tenant, input payload) payload {
+		_, hasIndex := input["index"]
+		if strings.TrimSpace(input.str("code", "provider_id", "provider")) == "" && !hasIndex {
+			if p := defaultProvider(t.GetAgentProviders()); p != nil {
+				input["code"] = providerIdentity(*p)
+			} else if t.GetAgentEndpoint() != "" {
+				// Preserve compatibility with tenants that still use the legacy
+				// single-provider columns while they migrate to the JSON list.
+				input["provider"], input["model"], input["endpoint"], input["api_key"] = t.GetAgentProvider(), t.GetAgentModel(), t.GetAgentEndpoint(), t.GetAgentApiKey()
+			}
+		}
+		return input
+	}
+	toolPayload := func(input map[string]any) payload {
+		p := payload(input)
+		if nested, ok := input["payload"].(map[string]any); ok && len(input) == 1 {
+			p = payload(nested)
+		}
+		return p
+	}
+	return []agentcore.Tool{
+		{Definition: ai.Tool{Name: "provider_list", Description: "列出当前企业管理应用所属租户的 Agent Provider 配置、模型和默认状态，不返回 API 密钥。", Properties: map[string]any{
+			"payload": map[string]any{"type": "object", "additionalProperties": false, "description": "无需参数"},
+		}}, Handler: func(ctx context.Context, input map[string]any) (string, error) {
+			t, err := queryTenant(ctx)
+			if err != nil {
+				return "", err
+			}
+			var providers []tenantProvider
+			if strings.TrimSpace(t.GetAgentProviders()) != "" && json.Unmarshal([]byte(t.GetAgentProviders()), &providers) != nil {
+				return "", fault.Invalid("Provider 配置格式错误")
+			}
+			if len(providers) == 0 && t.GetAgentEndpoint() != "" {
+				providers = []tenantProvider{{Name: t.GetAgentProvider(), Provider: t.GetAgentProvider(), Model: t.GetAgentModel(), Endpoint: t.GetAgentEndpoint(), Enabled: t.GetAgentEnabled(), Default: t.GetAgentEnabled()}}
+			}
+			out := make([]map[string]any, 0, len(providers))
+			for _, p := range providers {
+				name := p.Name
+				if name == "" {
+					name = p.Code
+				}
+				if name == "" {
+					name = p.Provider
+				}
+				out = append(out, map[string]any{"id": providerIdentity(p), "name": name, "provider": p.Provider, "model": p.Model, "endpoint": p.Endpoint, "models": p.Models, "enabled": p.Enabled, "default": p.Default})
+			}
+			b, _ := json.Marshal(map[string]any{"tenant_id": t.GetId(), "providers": out})
+			return string(b), nil
+		}},
+		{Definition: ai.Tool{Name: "provider_models", Description: "同步当前租户已配置 Provider 的可用模型列表。可选 code、provider_id 或 index 选择 Provider；不接受外部接口地址或密钥。", Properties: map[string]any{
+			"payload": map[string]any{"type": "object", "additionalProperties": true, "description": "可选 Provider 选择器 code、provider_id、index"},
+		}}, Handler: func(ctx context.Context, input map[string]any) (string, error) {
+			t, err := queryTenant(ctx)
+			if err != nil {
+				return "", err
+			}
+			p := selectProvider(t, toolPayload(input))
+			_, _, endpoint, key, err := resolveAgentProviderConfig(t, p)
+			if err != nil {
+				return "", err
+			}
+			u, err := providerURL(endpoint, "/models")
+			if err != nil {
+				return "", fault.Invalid("Provider Endpoint 格式不正确")
+			}
+			models, err := fetchAgentProviderModels(ctx, u, key, g.config.AgentHTTPClient)
+			if err != nil {
+				return "", fault.New(502, err.Error())
+			}
+			b, _ := json.Marshal(map[string]any{"models": models})
+			return string(b), nil
+		}},
+		{Definition: ai.Tool{Name: "provider_test", Description: "测试当前租户 Provider 的指定模型连通性。可选 code、provider_id、index 和 model；只测试已保存的 Provider。", Properties: map[string]any{
+			"payload": map[string]any{"type": "object", "additionalProperties": true, "description": "可选 Provider 选择器和模型名称"},
+		}}, Handler: func(ctx context.Context, input map[string]any) (string, error) {
+			t, err := queryTenant(ctx)
+			if err != nil {
+				return "", err
+			}
+			p := selectProvider(t, toolPayload(input))
+			_, model, endpoint, key, err := resolveAgentProviderConfig(t, p)
+			if err != nil {
+				return "", err
+			}
+			if strings.TrimSpace(model) == "" {
+				return "", fault.Invalid("模型不能为空")
+			}
+			u, err := providerURL(endpoint, "/chat/completions")
+			if err != nil {
+				return "", fault.Invalid("Provider Endpoint 格式不正确")
+			}
+			result, err := probeAgentModel(ctx, &http.Client{Timeout: 30 * time.Second}, u, model, key)
+			if err != nil {
+				return "", fault.New(502, err.Error())
+			}
+			b, _ := json.Marshal(result)
+			return string(b), nil
+		}},
+	}
 }
 
 func agentRouteRisk(path, method string) (agentcore.RiskLevel, bool) {
